@@ -34,4 +34,4 @@ with picamera.PiCamera() as cam:
                 cam.stop_recording()
                 print("stopped recording "+fileName)
                 print("converting to mp4")
-                os.system("MP4Box -fps 30 -add %s.h264 %s.mp4" % (filename, filename))
+                os.system("MP4Box -fps 30 -add %s.h264 %s.mp4" % (fileName, fileName))
