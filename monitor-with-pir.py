@@ -5,7 +5,7 @@ import datetime
 import sys
 import os
 
-media_directory = 'media'
+media_directory = 'home-server/public/images/media'
 def get_file_name():
     return media_directory + '/' + datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
