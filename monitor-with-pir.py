@@ -5,10 +5,16 @@ import datetime
 import sys
 import os
 
+media_directory = 'media'
 def get_file_name():
-    return datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    return media_directory + '/' + datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
 sensor = 4
+
+try:
+    os.mkdir(media_directory)
+except OSError:
+    pass
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(sensor, GPIO.IN, GPIO.PUD_DOWN)
