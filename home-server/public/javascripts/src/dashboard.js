@@ -6,7 +6,7 @@ $(function() {
       $.get('/media',
             function(data) {
               this.setState({data: data});
-              dayGraph.build(data);
+              data.map(function(day) { dayGraph.build(day); });
             }.bind(this)
       );
     },
