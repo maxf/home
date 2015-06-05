@@ -7,10 +7,14 @@
 
 # Running
 
-    jsx public/javascripts-src public/javascripts
+    jsx public/javascripts/src public/javascripts/build
     DEBUG=myapp npm start
 
+# Developing
 
+    jsx --watch public/javascripts/src public/javascripts/build
+    DEBUG=myapp npm start
+    
 
 
 

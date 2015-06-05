@@ -1,3 +1,4 @@
 home-server/node_modules
 home-server/public/images/media
-home-serer/public/javascripts
+home-server/public/javascripts/build
+.tern-port
