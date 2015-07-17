@@ -23,7 +23,7 @@ previous_state = False
 current_state = False
 
 with picamera.PiCamera() as cam:
-    camera.resolution = (800, 600)
+    cam.resolution = (800, 600)
     print("Starting at " + str(datetime.datetime.now()))
     while True:
         time.sleep(0.1)
