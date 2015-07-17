@@ -23,6 +23,7 @@ previous_state = False
 current_state = False
 
 with picamera.PiCamera() as cam:
+    camera.resolution = (800, 600)
     print("Starting at " + str(datetime.datetime.now()))
     while True:
         time.sleep(0.1)
@@ -33,10 +34,11 @@ with picamera.PiCamera() as cam:
             print("GPIO pin %s is %s" % (sensor, new_state))
             if current_state:
                 fileName = get_file_name()
-#                cam.capture(fileName+'.jpg')
                 print("starting recording at "+fileName)
                 cam.start_recording(fileName + '.h264')
-                time.sleep(30)
+                cam.wait_recording(10)
+                cam.capture(fileName+'.jpg', use_video_port=True)
+                cam.wait_recording(20)
                 cam.stop_recording()
                 print("stopped recording "+fileName)
                 print("converting to mp4")
