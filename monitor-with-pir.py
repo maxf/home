@@ -33,7 +33,7 @@ with picamera.PiCamera() as cam:
             print("GPIO pin %s is %s" % (sensor, new_state))
             if current_state:
                 fileName = get_file_name()
-                cam.capture(fileName+'.jpg')
+#                cam.capture(fileName+'.jpg')
                 print("starting recording at "+fileName)
                 cam.start_recording(fileName + '.h264')
                 time.sleep(30)
@@ -41,3 +41,5 @@ with picamera.PiCamera() as cam:
                 print("stopped recording "+fileName)
                 print("converting to mp4")
                 os.system("MP4Box -fps 30 -add %s.h264 %s.mp4" % (fileName, fileName))
+                os.remove(fileName + '.h264')
+                print("\a") # ring bell in terminal
