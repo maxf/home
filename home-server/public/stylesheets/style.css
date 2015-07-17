@@ -6,3 +6,18 @@ body {
 a {
   color: #00B7FF;
 }
+
+svg {
+  background-color: #ddd;
+}
+
+#tooltip {
+  position: fixed;
+  top: 0;
+  left: 45%;
+}
+
+#tooltip img {
+  width: 100px;
+  height: 100px;
+}

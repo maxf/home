@@ -3,14 +3,9 @@ extends layout
 block content
   h1 #{title}
 
-  div#example
+  div#tooltip
+    img
 
-  script(type='text/jsx').
-    React.render(
-      <h1>React!</h1>,
-      document.getElementById('example')
-    );
+  div#content
 
-  script(src='/javascripts/jquery.js')
   script(src='/javascripts/dashboard.js')
-
