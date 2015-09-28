@@ -12,12 +12,9 @@ svg {
 }
 
 #tooltip {
-  position: fixed;
-  top: 0;
-  left: 45%;
+  position: absolute;
 }
 
 #tooltip img {
   width: 100px;
-  height: 100px;
 }

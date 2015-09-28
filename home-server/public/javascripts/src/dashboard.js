@@ -1,3 +1,4 @@
+/*global $, d3*/
 (function($, d3) {
   'use strict';
 
@@ -12,7 +13,7 @@
 
   $(function() {
 
-    d3.json('/media', function(data) {
+    d3.json('/media', data => {
       var svg, timeAxis;
       var day = d3.select('#content')
         .selectAll('div')
@@ -21,7 +22,7 @@
         .append('div')
       ;
 
-      day.append('h2').text(function(d) { return d.date; });
+      day.append('h2').text( d => d.date );
       svg = day.append('svg').attr('width', 1000).attr('height', 50);
       svg
         .append('defs')
@@ -29,7 +30,8 @@
             .attr('id', 'dot')
             .append('circle')
               .attr('cx', 5).attr('cy', 5).attr('r', 5)
-              .attr('style', 'stroke: none; fill: black')
+              .style('stroke', 'none')
+              .style('fill', 'black')
       ;
 
       timeAxis = d3.svg.axis().scale(hoursScale).ticks(24);
@@ -39,26 +41,26 @@
         .call(timeAxis);
 
       svg.selectAll('a')
-        .data(function(d) { return d.events; })
+        .data( d => d.events )
         .enter()
         .append('a')
-          .attr('xlink:href', function(d) { return d.href + '.mp4'; })
+          .attr('xlink:href', d => `${d.href}.mp4` )
           .append('use')
             .attr('xlink:href', '#dot')
             .attr('x', function(d) {
               return timeOfDay(d.filePrefix) * 1000;
             })
             .attr('y', 10)
-            .on('mouseover', function(d) {
+            .on('mouseover', d => {
               d3.select('#tooltip')
-                .style('top', d3.event.pageY + 20 + 'px')
-                .style('left', d3.event.pageX + 10 + 'px')
+                .style('top', `${d3.event.pageY - 80}px`)
+                .style('left', `${d3.event.pageX + 10}px`)
                 .style('display', 'block');
               d3.select('#tooltip img')
-                .attr('src', d.href + '.jpg')
+                .attr('src', `${d.href}.jpg`)
               ;
             })
-            .on('mouseout', function() {
+            .on('mouseout', () => {
               d3.select('#tooltip').style('display', 'none');
             })
       ;

@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "lint": "eslint public/javascripts/src/*.js",
+    "babel": "babel --source-maps true public/javascripts/src --out-dir public/javascripts/build",
+    "babel:watch": "babel -w --source-maps true public/javascripts/src --out-dir public/javascripts/build",
+    "build": "npm run babel",
+    "build:watch": "npm run babel:watch"
   },
   "dependencies": {
     "body-parser": "^1.12.4",
