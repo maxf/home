@@ -11,10 +11,19 @@ svg {
   background-color: #ddd;
 }
 
+circle {
+  stroke: none;
+  fill: black;
+}
+
 #tooltip {
   position: absolute;
 }
 
 #tooltip img {
   width: 100px;
+}
+
+#plot {
+  fill: white;
 }

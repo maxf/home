@@ -9,48 +9,36 @@
     return (time[1] * 3600 + time[2] * 60 + parseInt(time[3], 10)) / 86400;
   }
 
+  function scaleDay(dateString) {
+    var date = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return ((parseInt(date[2], 10)-1)*31 + parseInt(date[3])) / 372; // FIXME
+  }
+
   var hoursScale = d3.scale.linear().domain([0, 24]).range([0, 1000]);
+  var daysScale = d3.scale.linear().domain([0, 365]).range([0, 1000]);
 
   $(function() {
+    var plot = d3.select('svg')
+      .append('g')
+      .attr('transform', 'translate(30, 30)')
+    ;
+    var timeAxis = d3.svg.axis().scale(hoursScale).ticks(24).orient('left');
+    var dayAxis = d3.svg.axis().scale(daysScale).ticks(12).orient('bottom');
 
     d3.json('/media', data => {
-      var svg, timeAxis;
-      var day = d3.select('#content')
-        .selectAll('div')
+
+      plot.append('g').call(timeAxis);
+      plot.append('g').call(dayAxis);
+
+      plot.selectAll('use.dot')
         .data(data)
         .enter()
-        .append('div')
-      ;
-
-      day.append('h2').text( d => d.date );
-      svg = day.append('svg').attr('width', 1000).attr('height', 50);
-      svg
-        .append('defs')
-          .append('symbol')
-            .attr('id', 'dot')
-            .append('circle')
-              .attr('cx', 5).attr('cy', 5).attr('r', 5)
-              .style('stroke', 'none')
-              .style('fill', 'black')
-      ;
-
-      timeAxis = d3.svg.axis().scale(hoursScale).ticks(24);
-
-      svg.append('g')
-        .attr('transform', 'translate(0, 28)')
-        .call(timeAxis);
-
-      svg.selectAll('a')
-        .data( d => d.events )
-        .enter()
-        .append('a')
-          .attr('xlink:href', d => `${d.href}.mp4` )
           .append('use')
+            .attr('class', 'dot')
             .attr('xlink:href', '#dot')
-            .attr('x', function(d) {
-              return timeOfDay(d.filePrefix) * 1000;
-            })
-            .attr('y', 10)
+            .attr('x', d => scaleDay(d.filePrefix) * 1000 )
+            .attr('y', d => timeOfDay(d.filePrefix) * 1000 )
+            .attr('data:date-time', d => d.filePrefix)
             .on('mouseover', d => {
               d3.select('#tooltip')
                 .style('top', `${d3.event.pageY - 80}px`)
