@@ -15,15 +15,15 @@
   }
 
   var hoursScale = d3.scale.linear().domain([0, 24]).range([0, 1000]);
-  var daysScale = d3.scale.linear().domain([0, 365]).range([0, 1000]);
+  var daysScale = d3.time.scale().domain([new Date(2015, 0, 1), new Date(2015, 11, 31)]).range([0, 1000]);
 
   $(function() {
     var plot = d3.select('svg')
       .append('g')
-      .attr('transform', 'translate(30, 30)')
+      .attr('transform', 'translate(54, 30)')
     ;
-    var timeAxis = d3.svg.axis().scale(hoursScale).ticks(24).orient('left');
-    var dayAxis = d3.svg.axis().scale(daysScale).ticks(12).orient('bottom');
+    var timeAxis = d3.svg.axis().scale(hoursScale).ticks(24).tickFormat(d => `${d}:00`).orient('left');
+    var dayAxis = d3.svg.axis().scale(daysScale).ticks(12).orient('top');
 
     d3.json('/media', data => {
 

@@ -16,7 +16,20 @@ circle {
   fill: black;
 }
 
+/* axes */
+.domain {
+  fill: none;
+  stroke-width: 1px;
+  stroke: black;
+}
+
+.tick line {
+  stroke: black;
+  stroke-width: 1px;
+}
+
 #tooltip {
+  display: none;
   position: absolute;
   font-size: 10px;
   padding: 2px 5px 2px 5px;
