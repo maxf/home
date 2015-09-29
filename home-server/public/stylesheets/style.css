@@ -33,6 +33,24 @@ circle.event-target {
   stroke-width: 1px;
 }
 
+/* intervals */
+rect.interval {
+  fill: #FAF6CD;
+  stroke: #eee;
+  stroke-width: 1px;
+}
+
+rect.interval2 {
+  fill: #DDDDFF;
+  stroke: #eee;
+  stroke-width: 1px;
+  opacity: .5;
+}
+
+#dot {
+  overflow: visible;
+}
+
 #tooltip {
   display: none;
   position: absolute;
