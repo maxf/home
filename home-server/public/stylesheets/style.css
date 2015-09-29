@@ -11,9 +11,14 @@ svg {
   background-color: #ddd;
 }
 
-circle {
+circle.visible {
   stroke: none;
-  fill: black;
+  fill: #3AAF7B;
+  pointer-events: none;
+}
+
+circle.event-target {
+  opacity: 0;
 }
 
 /* axes */
