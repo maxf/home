@@ -18,10 +18,13 @@ circle {
 
 #tooltip {
   position: absolute;
+  font-size: 10px;
+  padding: 2px 5px 2px 5px;
+  background-color: #ECB438;
 }
 
 #tooltip img {
-  width: 100px;
+  width: 120px;
 }
 
 #plot {
