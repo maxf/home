@@ -31,10 +31,10 @@ def in_weekday_ranges(the_day, day_ranges):
 
 # returns True if the datetime passed is within the schedule hours
 def in_monitoring_hours(date_time, schedule):
-    time = date_time.time()
+    the_time = date_time.time()
     weekday = date_time.weekday()
     for interval in schedule:
-        if interval['type'] == 'hours' and not in_time_ranges(time, interval['ranges']):
+        if interval['type'] == 'hours' and not in_time_ranges(the_time, interval['ranges']):
                 return False
         if interval['type'] == 'weekdays' and not in_weekday_ranges(weekday, interval['ranges']):
                 return False
@@ -56,7 +56,7 @@ with picamera.PiCamera() as cam:
     cam.resolution = (800, 600)
     print("Starting at " + str(datetime.datetime.now()))
     while True:
-        previous_in_hours = in_monitoring_hours(datetime.datetime.now, schedule)
+        previous_in_hours = in_monitoring_hours(datetime.datetime.now(), schedule)
         if previous_in_hours:
             time.sleep(0.1)
             previous_state = current_state
