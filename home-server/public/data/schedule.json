@@ -1,4 +1,4 @@
 [
   { "type": "hours", "ranges": [["00:00", "07:30"], ["09:00", "17:30"]] },
-  { "type": "weekdays", "ranges": [[0, 5]] }
+  { "type": "weekdays", "ranges": [[0, 4]] }
 ]
