@@ -7,8 +7,9 @@ import sys
 import os
 
 media_directory = 'home-server/public/images/media'
-schedule = json.loads(open('schedule.json').read())
-previous_in_hours = -1
+data_directory = 'home-server/public/data/'
+schedule = json.loads(open(data_directory + 'schedule.json').read())
+in_hours = False
 sensor = 4
 previous_state = False
 current_state = False
@@ -25,7 +26,7 @@ def in_time_ranges(the_time, time_ranges):
 # returns True if the day of the week passed is within on the day ranges passed
 def in_weekday_ranges(the_day, day_ranges):
     for day_range in day_ranges:
-        if day_range[0] < the_day < day_range[1]:
+        if day_range[0] <= the_day <= day_range[1]:
             return True
     return False
 
@@ -56,8 +57,13 @@ with picamera.PiCamera() as cam:
     cam.resolution = (800, 600)
     print("Starting at " + str(datetime.datetime.now()))
     while True:
-        previous_in_hours = in_monitoring_hours(datetime.datetime.now(), schedule)
-        if previous_in_hours:
+        new_in_hours = in_monitoring_hours(datetime.datetime.now(), schedule)
+        if in_hours and not new_in_hours:
+            print('leaving in hours at ' + str(datetime.datetime.now()))
+        if not in_hours and new_in_hours:
+            print('entering in hours at ' + str(datetime.datetime.now()))
+	in_hours = new_in_hours
+        if in_hours:
             time.sleep(0.1)
             previous_state = current_state
             current_state = GPIO.input(sensor)
