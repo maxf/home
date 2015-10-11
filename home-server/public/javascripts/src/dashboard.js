@@ -101,6 +101,8 @@
                   .style('top', `${d3.event.pageY - 80}px`)
                   .style('left', `${d3.event.pageX + 10}px`)
                   .style('display', 'block')
+                  .select('#vidlink')
+                    .attr('href', `${d.href}.mp4`)
                 ;
                 d3.select('#tooltip img')
                   .attr('src', `${d.href}.jpg`)
@@ -108,9 +110,6 @@
                 d3.select('#tooltip span')
                   .text(d.filePrefix)
                 ;
-              })
-              .on('mouseout', () => {
-                d3.select('#tooltip').style('display', 'none');
               })
         ;
       });

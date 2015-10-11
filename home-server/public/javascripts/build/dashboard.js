@@ -1,8 +1,8 @@
 /*global $, d3*/
-'use strict';
+"use strict";
 
 (function ($, d3) {
-  'use strict';
+  "use strict";
 
   var canvasWidth = 3000; // TODO: read from SVG attributes
   var canvasHeight = 1000;
@@ -34,70 +34,65 @@
   var daysScale = d3.time.scale().domain([new Date(currentYear, 0, 1), new Date(currentYear + 1, 0, 1)]).range([0, canvasWidth]);
 
   $(function () {
-    var plot = d3.select('svg').append('g').attr('transform', 'translate(54, 30)');
+    var plot = d3.select("svg").append("g").attr("transform", "translate(54, 30)");
 
-    d3.json('/media', function (media) {
-      d3.json('/data/schedule.json', function (schedule) {
+    d3.json("/media", function (media) {
+      d3.json("/data/schedule.json", function (schedule) {
         schedule.map(function (intervals) {
           switch (intervals.type) {
-            case 'hours':
+            case "hours":
               intervals.ranges.map(function (range) {
                 var startTimeMatch = range[0].match(/^(\d{2}):(\d{2})$/);
                 var endTimeMatch = range[1].match(/^(\d{2}):(\d{2})$/);
                 var topLeftY = timeMapping(parseInt(startTimeMatch[1]), parseInt(startTimeMatch[2]), 0);
                 var bottomLeftY = timeMapping(parseInt(endTimeMatch[1], 10), parseInt(endTimeMatch[2], 10), 0);
-                plot.append('rect').attr('class', 'interval').attr('x', 0).attr('y', topLeftY * canvasHeight).attr('width', canvasWidth).attr('height', (bottomLeftY - topLeftY) * canvasHeight);
+                plot.append("rect").attr("class", "interval").attr("x", 0).attr("y", topLeftY * canvasHeight).attr("width", canvasWidth).attr("height", (bottomLeftY - topLeftY) * canvasHeight);
               });
               break;
-            case 'weekdays':
+            case "weekdays":
               // loop through all days in the year and highlight if day isn't in interval
               var startMs = new Date(currentYear, 0, 1).getTime();
               var endMs = new Date(currentYear + 1, 0, 1).getTime();
-
-              var _loop = function (ms) {
-                var date = new Date(ms);
-                var dow = (date.getDay() + 1) % 7;
-                intervals.ranges.map(function (range) {
-                  console.log(range, dow);
-                  if (range && dow >= range[0] && dow <= range[1]) {
-                    console.log('yes');
-                    var x = daysScale(date);
-                    var width = daysScale(date.getTime() + 24 * 3600 * 1000) - x;
-                    plot.append('rect').attr('class', 'interval2').attr('x', x).attr('y', 0).attr('width', width).attr('height', canvasHeight);
-                  }
-                });
-              };
-
               for (var ms = startMs; ms < endMs; ms += 24 * 3600 * 1000) {
-                _loop(ms);
+                (function (ms) {
+                  var date = new Date(ms);
+                  var dow = (date.getDay() + 1) % 7;
+                  intervals.ranges.map(function (range) {
+                    console.log(range, dow);
+                    if (range && dow >= range[0] && dow <= range[1]) {
+                      console.log("yes");
+                      var x = daysScale(date);
+                      var width = daysScale(date.getTime() + 24 * 3600 * 1000) - x;
+                      plot.append("rect").attr("class", "interval2").attr("x", x).attr("y", 0).attr("width", width).attr("height", canvasHeight);
+                    }
+                  });
+                })(ms);
               }
               break;
           }
         });
 
         var timeAxis = d3.svg.axis().scale(hoursScale).ticks(24).tickFormat(function (d) {
-          return '' + d + ':00';
-        }).orient('left');
-        var dayAxis = d3.svg.axis().scale(daysScale).ticks(12).orient('top');
+          return "" + d + ":00";
+        }).orient("left");
+        var dayAxis = d3.svg.axis().scale(daysScale).ticks(12).orient("top");
 
-        plot.append('g').call(timeAxis);
-        plot.append('g').call(dayAxis);
+        plot.append("g").call(timeAxis);
+        plot.append("g").call(dayAxis);
 
-        plot.selectAll('use.dot').data(media).enter().append('use').attr('class', 'dot').attr('xlink:href', '#dot').attr('x', function (d) {
+        plot.selectAll("use.dot").data(media).enter().append("use").attr("class", "dot").attr("xlink:href", "#dot").attr("x", function (d) {
           return scaleDay(d.filePrefix) * canvasWidth;
-        }).attr('y', function (d) {
+        }).attr("y", function (d) {
           return timeOfDay(d.filePrefix) * canvasHeight;
-        }).attr('data:date-time', function (d) {
+        }).attr("data:date-time", function (d) {
           return d.filePrefix;
-        }).on('mouseover', function (d) {
-          d3.select('#tooltip').style('top', '' + (d3.event.pageY - 80) + 'px').style('left', '' + (d3.event.pageX + 10) + 'px').style('display', 'block');
-          d3.select('#tooltip img').attr('src', '' + d.href + '.jpg');
-          d3.select('#tooltip span').text(d.filePrefix);
-        }).on('mouseout', function () {
-          d3.select('#tooltip').style('display', 'none');
+        }).on("mouseover", function (d) {
+          d3.select("#tooltip").style("top", "" + (d3.event.pageY - 80) + "px").style("left", "" + (d3.event.pageX + 10) + "px").style("display", "block").select("#vidlink").attr("href", "" + d.href + ".mp4");
+          d3.select("#tooltip img").attr("src", "" + d.href + ".jpg");
+          d3.select("#tooltip span").text(d.filePrefix);
         });
       });
     });
   });
 })($, d3);
-//# sourceMappingURL=dashboard.js.map
+
