@@ -44,24 +44,44 @@ def in_monitoring_hours(date_time, schedule):
 def get_file_name():
     return media_directory + '/' + datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
+def initialise_led(camled, gpio):
+    # in order to be able to control the led, /boot/options.txt should include the line:
+    # 'disable_camera_led=1'
+    gpio.setup(camled, gpio.OUT, initial=False)
+    # test by blinking the LED 3 times
+    for i in range(3):
+        gpio.output(camled, True)
+        time.sleep(0.5)
+        gpio.output(camled, False)
+        time.sleep(0.5)
+    
 try:
     os.mkdir(media_directory)
 except OSError:
     pass
 
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(sensor, GPIO.IN, GPIO.PUD_DOWN)
-
 
 with picamera.PiCamera() as cam:
     cam.resolution = (800, 600)
     print("Starting at " + str(datetime.datetime.now()))
+    CAMLED=32
+    initialise_led(CAMLED, GPIO)
+
     while True:
         new_in_hours = in_monitoring_hours(datetime.datetime.now(), schedule)
         if in_hours and not new_in_hours:
-            print('leaving in hours at ' + str(datetime.datetime.now()))
+            print('-----------------------------------')
+            print('Leaving in hours at ' + str(datetime.datetime.now()))
+            print('-----------------------------------')
+            GPIO.output(CAMLED, False)
         if not in_hours and new_in_hours:
-            print('entering in hours at ' + str(datetime.datetime.now()))
+            print('-----------------------------------')
+            print('Entering in hours at ' + str(datetime.datetime.now()))
+            print('-----------------------------------')
+            GPIO.output(CAMLED, True)
 	in_hours = new_in_hours
         if in_hours:
             time.sleep(0.1)
