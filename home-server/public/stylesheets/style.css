@@ -54,13 +54,23 @@ rect.interval2 {
 #tooltip {
   display: none;
   position: absolute;
-  font-size: 10px;
+  font-size: 15px;
   padding: 2px 5px 2px 5px;
   background-color: #ECB438;
 }
 
 #tooltip img {
   width: 200px;
+}
+
+#tooltip div.title {
+  float: left;
+}
+
+#tooltip div.close {
+  float: right;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 #plot {

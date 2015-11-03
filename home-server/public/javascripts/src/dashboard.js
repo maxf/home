@@ -39,6 +39,13 @@
       .attr('transform', 'translate(54, 30)')
     ;
 
+    d3.select('#tooltip div.close')
+      .on('click', d => {
+        d3.select('#tooltip').style('display', 'none');
+      })
+    ;
+
+
     d3.json('/media', media => {
       d3.json('/data/schedule.json', schedule => {
         schedule.map(intervals => {
@@ -107,7 +114,7 @@
                 d3.select('#tooltip img')
                   .attr('src', `${d.href}.jpg`)
                 ;
-                d3.select('#tooltip span')
+                d3.select('#tooltip div.title')
                   .text(d.filePrefix)
                 ;
               })
