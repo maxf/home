@@ -1,4 +1,5 @@
 home-server/node_modules
 home-server/public/images/media
 .tern-port
+npm-debug.log
 *~
