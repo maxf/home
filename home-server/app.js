@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var media = require('./routes/media');
+var cctv = require('./routes/cctv');
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/cctv', cctv);
 app.use('/media', media);
 
 // catch 404 and forward to error handler

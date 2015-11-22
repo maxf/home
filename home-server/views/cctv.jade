@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  div#tooltip
+    div.title
+    div.close ╳
+    a#vidlink
+      img
+
+  div#content
+    svg(width='3200', height='1200')
+      defs
+        symbol#dot
+          circle.event-target(cx='0', cy='0', r='5')
+          circle.visible(cx='0', cy='0', r='3')
+
+  script(src='/javascripts/build/dashboard.js')

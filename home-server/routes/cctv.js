@@ -8,7 +8,10 @@ var fs = require('fs');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Dashboard' });
+  res.render('cctv', { title: 'CCTV' });
 });
+
+
+
 
 module.exports = router;
