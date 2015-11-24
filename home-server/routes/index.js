@@ -11,4 +11,10 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Dashboard' });
 });
 
+router.post('/', function(req, res, next) {
+  console.log(req.body);
+  res.render('index', { title: 'Dashboard' });
+});
+
+
 module.exports = router;
