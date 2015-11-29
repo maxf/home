@@ -55,7 +55,7 @@ def initialise_led(camled, gpio):
         time.sleep(0.5)
         gpio.output(camled, False)
         time.sleep(0.5)
-    
+
 try:
     os.mkdir(media_directory)
 except OSError:
