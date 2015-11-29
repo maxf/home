@@ -28,6 +28,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// application global parameters
+app.locals.socketsApiUrl = process.env.SOCKETS_API_URL;
+
 app.use('/', routes);
 app.use('/api', api);
 app.use('/cctv', cctv);
