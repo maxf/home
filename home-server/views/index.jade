@@ -1,7 +1,11 @@
 extends layout
 
+
 block content
   h1 #{title}
 
-  form(method="post")
-    button Toggle
+  button#switch-on On
+  button#switch-off Off
+
+block end_scripts
+  script(src='/javascripts/dashboard.js')
