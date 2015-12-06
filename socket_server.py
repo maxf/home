@@ -1,6 +1,7 @@
 from wsgiref.simple_server import make_server
 import RPi.GPIO as GPIO
 import time
+import re
 
 def init():
 	# set the pins numbering mode
@@ -43,32 +44,58 @@ def modulate():
 
 
 def send_code(a,b,c,d):
-	GPIO.output(11, a)
-	GPIO.output(15, b)
-	GPIO.output(16, c)
-	GPIO.output(13, d)
+#	print('Printing code %d%d%d%d' % (a,b,c,d))
+	GPIO.output(11, True if a == 1 else False)
+	GPIO.output(15, True if b == 1 else False)
+	GPIO.output(16, True if c == 1 else False)
+	GPIO.output(13, True if d == 1 else False)
 	modulate()
 
+def switch_on(id = None):
+	if id == 1:
+		send_code(1,1,1,1)
+	elif id == 2:
+		send_code(0,1,1,1)
+	elif id == 3:
+		send_code(1,0,1,1)
+	elif id == 4:
+		send_code(0,0,1,1)
+	else:
+		send_code(1,1,0,1)
 
-def hello_world_app(environ, start_response):
+def switch_off(id = None):
+	if id == 1:
+		send_code(1,1,1,0)
+	elif id == 2:
+		send_code(1,1,1,0)
+	elif id == 3:
+		send_code(1,0,1,0)
+	elif id == 4:
+		send_code(0,1,0,0)
+	else:
+		send_code(1,1,0,0)
+
+
+def server(environ, start_response):
 
     status = '200 OK'
     headers = [('Content-type', 'text/plain')]
     start_response(status, headers)
     path = environ['PATH_INFO']
 
-    if path == '/on':
-        send_code(True, True, True, True)
-        return ['on']
-    elif path == '/off':
-        send_code(True, True, True, False)
-        return ['off']
+    [dummy, switch_number, on_off] = re.split('/', path)
+
+#    print('switching %s to %s' % (switch_number, on_off))
+
+    if on_off == 'on':
+        switch_on(int(switch_number))
     else:
-        return ['none']
+	switch_off(int(switch_number))
+    return str(switch_number) + ': ' + on_off + '\n'
 
 try:
     init()
-    httpd = make_server('', 8000, hello_world_app)
+    httpd = make_server('', 8000, server)
     print "Serving on port 8000..."
     httpd.serve_forever()
 except KeyboardInterrupt:
