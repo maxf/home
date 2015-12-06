@@ -4,8 +4,10 @@ extends layout
 block content
   h1 #{title}
 
-  button#switch-on On
-  button#switch-off Off
+  input(type='radio' name='on-off' value='on' id='switch-on')
+  | On
+  input(type='radio' name='on-off' value='off' id='switch-off')
+  | Off
 
 block end_scripts
   script(src='/javascripts/dashboard.js')
