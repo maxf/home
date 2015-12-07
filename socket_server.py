@@ -67,7 +67,7 @@ def switch_off(id = None):
 	if id == 1:
 		send_code(1,1,1,0)
 	elif id == 2:
-		send_code(1,1,1,0)
+		send_code(0,1,1,0)
 	elif id == 3:
 		send_code(1,0,1,0)
 	elif id == 4:
