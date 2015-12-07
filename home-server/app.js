@@ -67,5 +67,24 @@ app.use(function(err, req, res, next) {
   });
 });
 
+//-----------------------
+// scheduler
+
+app.locals.schedule = [
+  {
+    start: { hours: 8, minutes: 0, random: true },
+    end: { hours: 23, minutes: 0 , random: false },
+    quickOnOff: true
+  }
+];
+
+
+function timeCheck() {
+  console.log('time check at ', new Date());
+}
+
+
+setInterval(timeCheck, 10000);
+
 
 module.exports = app;
