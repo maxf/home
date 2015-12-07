@@ -76,3 +76,7 @@ rect.interval2 {
 #plot {
   fill: white;
 }
+
+.slider {
+  margin: 1em 0 1em 0;
+}
