@@ -1,6 +1,6 @@
 install:
-	npm install -g supervisor
+	sudo npm install -g supervisor
 	npm install
 
-run: install
+run: 
 	supervisor -e 'js,jade' bin/www
