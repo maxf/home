@@ -52,20 +52,31 @@ def modulate():
 
 
 def send_code(a,b,c,d):
-	GPIO.output(11, a)
-	GPIO.output(15, b)
-	GPIO.output(16, c)
-	GPIO.output(13, d)
+	GPIO.output(11, True if a == 1 else False)
+	GPIO.output(15, True if b == 1 else False)
+	GPIO.output(16, True if c == 1 else False)
+	GPIO.output(13, True if d == 1 else False)
 	modulate()
 
 try:
 	init()
 	while True:
   		raw_input('hit return key to send socket 1 ON code')
-		send_code(True, True, True, True)
-
+		send_code(1,1,1,1)
 		raw_input('hit return key to send socket 1 OFF code')
-		send_code(True, True, True, False)
+		send_code(1,1,1,0)
+  		raw_input('hit return key to send socket 2 ON code')
+		send_code(0,1,1,1)
+		raw_input('hit return key to send socket 2 OFF code')
+		send_code(0,1,1,0)
+  		raw_input('hit return key to send socket 3 ON code')
+		send_code(1,0,1,1)
+		raw_input('hit return key to send socket 3 OFF code')
+		send_code(1,0,1,0)
+  		raw_input('hit return key to send socket 4 ON code')
+		send_code(0,0,1,1)
+		raw_input('hit return key to send socket 4 OFF code')
+		send_code(0,0,1,0)
 
 # Clean up the GPIOs for next time
 except KeyboardInterrupt:
