@@ -52,7 +52,9 @@ def send_code(a,b,c,d):
 	modulate()
 
 def switch_on(id = None):
-	if id == 1:
+	if id == 0:
+		send_code(1,1,0,1)
+	elif id == 1:
 		send_code(1,1,1,1)
 	elif id == 2:
 		send_code(0,1,1,1)
@@ -61,19 +63,22 @@ def switch_on(id = None):
 	elif id == 4:
 		send_code(0,0,1,1)
 	else:
-		send_code(1,1,0,1)
+		print ("Error: unknown socket number " + str(id))
+
 
 def switch_off(id = None):
-	if id == 1:
+	if id == 0:
+		send_code(1,1,0,0)
+	elif id == 1:
 		send_code(1,1,1,0)
 	elif id == 2:
 		send_code(0,1,1,0)
 	elif id == 3:
 		send_code(1,0,1,0)
 	elif id == 4:
-		send_code(0,1,0,0)
+		send_code(0,0,1,0)
 	else:
-		send_code(1,1,0,0)
+		print ("Error: unknown socket number " + str(id))
 
 
 def server(environ, start_response):
