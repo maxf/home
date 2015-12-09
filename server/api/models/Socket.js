@@ -14,7 +14,8 @@ module.exports = {
     },
     onTimeMinute: {
       type: 'integer',
-      required: true
+      required: false,
+      defaultsTo: 0
     },
     offTimeHour: {
       type: 'integer',
@@ -22,15 +23,18 @@ module.exports = {
     },
     offTimeMinute: {
       type: 'integer',
-      required: true
+      required: false,
+      defaultsTo: 0
     },
     random: {
       type: 'boolean',
-      required: true
+      required: false,
+      defaultsTo: true
     },
     randomBreaks: {
       type: 'boolean',
-      required: true
+      required: false,
+      defaultsTo: true
     }
   }
 };
