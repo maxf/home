@@ -8,6 +8,15 @@
 module.exports = {
 
   attributes: {
+    physicalSocket: {
+      type: 'integer',
+      required: true
+    },
+    state: {
+      type: 'boolean',
+      required: false,
+      defaultsTo: 0
+    },
     onTimeHour: {
       type: 'integer',
       required: true
