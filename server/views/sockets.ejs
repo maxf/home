@@ -2,41 +2,9 @@
 <h1>Sockets</h1>
 
 <% sockets.forEach(function(socket) { %>
-  <div id="socket-<%= socket.id %>">
-    <h2>Socket <%= socket.physicalSocket %></h2>
-    <input type="radio" name="socket-state-<%= socket.id %>" checked/>
-    <input type="radio" name="socket-state-<%= socket.id %>"/>
-    <ul>
-      <li>Time on: <%= socket.onTimeHour + ':' + socket.onTimeMinute %></li>
-      <li>Time off: <%= socket.offTimeHour + ':' + socket.offTimeMinute %></li>
-      <li>Random: <%= socket.random %></li>
-      <li>Random breaks: <%= socket.randomBreaks %></li>
-    </ul>
-  </div>
+  <%- partial('partials/socket.ejs', {socket: socket}) %>
 <% }); %>
 
 <h1>Add a socket</h1>
 
-<form action="/socket" method="post">
-  <label for="physicalSocket">Physical socket: </label>
-  <input type="text" name="physicalSocket" id="physicalSocket"/>
-  <div>
-    <label>Time on: </label>
-    <input type="text" name="onTimeHour" id="onTimeHour"/>
-    <input type="text" name="onTimeMinute" id="onTimeMinute"/>
-  </div>
-  <div>
-    <label>Time off: </label>
-    <input type="text" name="offTimeHour" id="offTimeHour"/>
-    <input type="text" name="offTimeMinute" id="offTimeMinute"/>
-  </div>
-  <div>
-    <label for="random">Random start/end times</label>
-    <input type="checkbox" name="random" id="random"/>
-  </div>
-  <div>
-    <label for="randomBreaks">Random breaks</label>
-    <input type="checkbox" name="randomBreaks" id="randomBreaks"/>
-  </div>
-  <input type="submit" value="Add"/>
-</form>
+<%- partial('partials/socket.ejs', { socket : {}}) %>

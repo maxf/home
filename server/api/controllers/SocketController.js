@@ -27,11 +27,30 @@ module.exports = {
   },
 
 
-   socketsPage: function(req, res) {
-     SocketService.getSockets(function(sockets) {
-       res.view('sockets', {
-         sockets: sockets
-       });
-     });
-   }
+  socketsPage: function(req, res) {
+    console.log(req.route.method);
+    if (req.route.method === 'post') {
+      // Either an existing socket was modified, or a new one was created
+      console.log(req.body);
+      if (req.params.id) {
+        // Updating existing socket
+        console.log('updating socket ' + req.params.id);
+      } else {
+        // Create a new socket
+        SocketService.addSocketFromView(req.body, function(success) {
+          if (!success) throw 'Failed to add socket';
+          SocketService.getSocketsForView(function(socketsForView) {
+            res.view('sockets', {
+              sockets: socketsForView
+            });
+          });
+        });
+      }
+    }
+    SocketService.getSocketsForView(function(socketsForView) {
+      res.view('sockets', {
+        sockets: socketsForView
+      });
+    });
+  }
 };

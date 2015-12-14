@@ -15,7 +15,7 @@ module.exports = {
     state: {
       type: 'boolean',
       required: false,
-      defaultsTo: 0
+      defaultsTo: false
     },
     onTimeHour: {
       type: 'integer',
