@@ -2,6 +2,7 @@
 <h1>Sockets</h1>
 
 <% sockets.forEach(function(socket) { %>
+  <h2><%= socket.id %></h2>
   <%- partial('partials/socket.ejs', {socket: socket}) %>
 <% }); %>
 

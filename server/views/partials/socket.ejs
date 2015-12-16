@@ -35,3 +35,9 @@
   </div>
   <input type="submit" value="Set"/>
 </form>
+<% if (id) { %>
+<form action="/sockets/" method="post">
+  <input type="hidden" name="delete_id" value="<%= id %>"/>
+  <input type="submit" value="Delete"/>
+</form>
+<% } %>

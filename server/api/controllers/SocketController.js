@@ -38,18 +38,25 @@ module.exports = {
     }
 
     if (req.route.method === 'post') {
-      sails.log(req.route.method);
-      sails.log(req.body);
       // Either an existing socket was modified, or a new one was created
       if (req.body.id) {
-        // Updating existing socket
-        sails.log('updating socket ' + req.body.id);
-      } else {
-        // Create a new socket
-        SocketService.addSocketFromView(req.body, function(success) {
-          if (!success) throw 'Failed to add socket';
+        SocketService.modifySocketFromView(req.body, function(success) {
+          if (!success) throw 'Failed to modify socket';
           sendView(res);
         });
+      } else {
+        if (req.body.delete_id) {
+          SocketService.removeSocket(req.body.delete_id, function(success) {
+            if (!success) throw 'Failed to delete socket';
+            sendView(res);
+          });
+        } else {
+          // Create a new socket
+          SocketService.addSocketFromView(req.body, function(success) {
+            if (!success) throw 'Failed to add socket';
+            sendView(res);
+          });
+        }
       }
     } else {
       sendView(res);
