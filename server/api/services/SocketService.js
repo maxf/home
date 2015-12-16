@@ -1,3 +1,5 @@
+Utils = require('../services/utils');
+
 module.exports = {
   getSockets: function(next) {
     Socket.find().exec(function(err, sockets) {
@@ -6,8 +8,6 @@ module.exports = {
     });
   },
   addSocket: function(socketVal, next) {
-    sails.log('add socket');
-    sails.log(socketVal)
     Socket.create(socketVal).exec(function(err, socket) {
       if(err) throw err;
       next(socket);
@@ -27,6 +27,7 @@ module.exports = {
       viewSockets = sockets.map(function(socket) {
         return {
           id: socket.id,
+          physicalSocket: socket.physicalSocket,
           state: socket.state,
           timeOn: Utils.formatTime(socket.onTimeHour, socket.onTimeMinute),
           timeOff: Utils.formatTime(socket.offTimeHour, socket.offTimeMinute),

@@ -28,29 +28,31 @@ module.exports = {
 
 
   socketsPage: function(req, res) {
-    console.log(req.route.method);
+
+    function sendView(res) {
+     SocketService.getSocketsForView(function(socketsForView) {
+       res.view('sockets', {
+         sockets: socketsForView
+       });
+     });
+    }
+
     if (req.route.method === 'post') {
+      sails.log(req.route.method);
+      sails.log(req.body);
       // Either an existing socket was modified, or a new one was created
-      console.log(req.body);
-      if (req.params.id) {
+      if (req.body.id) {
         // Updating existing socket
-        console.log('updating socket ' + req.params.id);
+        sails.log('updating socket ' + req.body.id);
       } else {
         // Create a new socket
         SocketService.addSocketFromView(req.body, function(success) {
           if (!success) throw 'Failed to add socket';
-          SocketService.getSocketsForView(function(socketsForView) {
-            res.view('sockets', {
-              sockets: socketsForView
-            });
-          });
+          sendView(res);
         });
       }
+    } else {
+      sendView(res);
     }
-    SocketService.getSocketsForView(function(socketsForView) {
-      res.view('sockets', {
-        sockets: socketsForView
-      });
-    });
   }
 };

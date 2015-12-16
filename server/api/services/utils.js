@@ -1,4 +1,4 @@
-module.exports.Utils = {
+module.exports = {
   pad: function(n, width, z) {
     z = z || '0';
     n = n + '';
@@ -6,7 +6,7 @@ module.exports.Utils = {
   },
 
   formatTime: function(h, m) {
-    return pad(h, 2) + ':' + pad(m, 2);
+    return this.pad(h, 2) + ':' + this.pad(m, 2);
   }
 
 };

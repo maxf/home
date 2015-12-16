@@ -1,15 +1,15 @@
 <%
   var id = socket.id || '';
   var on = socket.state ? 'checked' : '';
-  var ontm = socket.onTime || '';
-  var oftm = socket.offTime || '';
-  var soid = socket.physicalSocket || '';
+  var ontm = socket.onTime || '18:42';
+  var oftm = socket.offTime || '23:33';
+  var soid = socket.physicalSocket || '1';
   var rand = socket.random ? 'checked' : '';
   var rndb = socket.randomBreaks ? 'checked' : '';
 %>
 
-<form action="/sockets/<%= id %>" method="post" id="<%= id %>">
-
+<form action="/sockets/" method="post">
+  <input type="hidden" name="id" value="<%= id %>"/>
   <div>
     <label for="random">Currently on:</label>
     <input type="checkbox" name="state" <%= on %>/>

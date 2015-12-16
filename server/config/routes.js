@@ -46,5 +46,5 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'r|^/sockets/\\d*$|id': 'SocketController.socketsPage'
+  '/sockets/': 'SocketController.socketsPage'
 };
