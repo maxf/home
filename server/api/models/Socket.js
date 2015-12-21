@@ -8,6 +8,11 @@
 module.exports = {
 
   attributes: {
+    description: {
+      type: 'string',
+      required: false,
+      defaultsTo: ''
+    },
     physicalSocket: {
       type: 'integer',
       required: true

@@ -1,5 +1,6 @@
 <%
   var id = socket.id || '';
+  var desc = socket.description || '';
   var on = socket.state ? 'checked' : '';
   var ontm = socket.onTime || '18:42';
   var oftm = socket.offTime || '23:33';
@@ -11,6 +12,9 @@
 <form action="/sockets/" method="post">
   <input type="hidden" name="id" value="<%= id %>"/>
   <div>
+    <label for="description">Description:</label>
+    <input type="text" name="description" value="<%= desc %>"/>
+  <div>
     <label for="random">Currently on:</label>
     <input type="checkbox" name="state" <%= on %>/>
   </div>
@@ -19,11 +23,11 @@
   <input type="text" name="physicalSocket" value="<%= soid %>"/>
   <div>
     <label>Time on: </label>
-    <input type="text" name="onTime" value="<%= ontm %>"/>
+    <input type="text" class="short" name="onTime" value="<%= ontm %>"/>
   </div>
   <div>
     <label>Time off: </label>
-    <input type="text" name="offTime" value="<%= oftm %>"/>
+    <input type="text" class="short" name="offTime" value="<%= oftm %>"/>
   </div>
   <div>
     <label for="random">Random start/end times</label>

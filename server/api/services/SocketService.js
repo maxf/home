@@ -33,6 +33,7 @@ module.exports = {
       viewSockets = sockets.map(function(socket) {
         return {
           id: socket.id,
+          description: socket.description,
           physicalSocket: socket.physicalSocket,
           state: socket.state,
           onTime: Utils.formatTime(socket.onTimeHour, socket.onTimeMinute),
@@ -46,6 +47,7 @@ module.exports = {
   },
   addSocketFromView: function(socketVal, next) {
     var socket = {};
+    socket.description = socketVal.description;
     socket.physicalSocket = parseInt(socketVal.physicalSocket, 10);
     socket.state = socketVal.state === 'on';
     socket.onTimeHour = parseInt(socketVal.onTime.slice(0, 2), 10);
@@ -60,6 +62,7 @@ module.exports = {
   },
   modifySocketFromView: function(socketVal, next) {
     var socket = {};
+    socket.description = socketVal.description;
     socket.physicalSocket = parseInt(socketVal.physicalSocket, 10);
     socket.state = socketVal.state === 'on';
     socket.onTimeHour = parseInt(socketVal.onTime.slice(0, 2), 10);
