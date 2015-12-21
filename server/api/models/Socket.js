@@ -22,8 +22,8 @@ module.exports = {
       required: true,
       defaultsTo: false,
     },
-    state: {
-      type: 'boolean',
+    switchedOn: {
+      type: 'boolean', // True: the socket is on. Else it's off
       required: false,
       defaultsTo: false
     },

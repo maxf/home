@@ -10,6 +10,8 @@
  */
 module.exports.globals = {
 
+  socketsApiUrl: process.env.SOCKETS_API_URL
+
   /****************************************************************************
   *                                                                           *
   * Expose the lodash installed in Sails core as a global variable. If this   *
