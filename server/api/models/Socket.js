@@ -17,6 +17,11 @@ module.exports = {
       type: 'integer',
       required: true
     },
+    timerMode: {
+      type: 'boolean',
+      required: true,
+      defaultsTo: false,
+    },
     state: {
       type: 'boolean',
       required: false,

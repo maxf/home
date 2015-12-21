@@ -36,6 +36,7 @@ module.exports = {
           description: socket.description,
           physicalSocket: socket.physicalSocket,
           state: socket.state,
+          timerMode: socket.timerMode,
           onTime: Utils.formatTime(socket.onTimeHour, socket.onTimeMinute),
           offTime: Utils.formatTime(socket.offTimeHour, socket.offTimeMinute),
           random: socket.random,
@@ -50,6 +51,7 @@ module.exports = {
     socket.description = socketVal.description;
     socket.physicalSocket = parseInt(socketVal.physicalSocket, 10);
     socket.state = socketVal.state === 'on';
+    socket.timerMode = socketVal.timerMode;
     socket.onTimeHour = parseInt(socketVal.onTime.slice(0, 2), 10);
     socket.onTimeMinute = parseInt(socketVal.onTime.slice(3, 5), 10);
     socket.offTimeHour = parseInt(socketVal.offTime.slice(0, 2), 10);
@@ -65,6 +67,7 @@ module.exports = {
     socket.description = socketVal.description;
     socket.physicalSocket = parseInt(socketVal.physicalSocket, 10);
     socket.state = socketVal.state === 'on';
+    socket.timerMode = socketVal.timerMode;
     socket.onTimeHour = parseInt(socketVal.onTime.slice(0, 2), 10);
     socket.onTimeMinute = parseInt(socketVal.onTime.slice(3, 5), 10);
     socket.offTimeHour = parseInt(socketVal.offTime.slice(0, 2), 10);

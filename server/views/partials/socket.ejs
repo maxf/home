@@ -2,6 +2,7 @@
   var id = socket.id || '';
   var desc = socket.description || '';
   var on = socket.state ? 'checked' : '';
+  var timr = socket.timerMode ? 'checked' : '';
   var ontm = socket.onTime || '18:42';
   var oftm = socket.offTime || '23:33';
   var soid = socket.physicalSocket;
@@ -16,13 +17,17 @@
     <input type="text" name="description" value="<%= desc %>"/>
   </div>
   <div>
+    <label for="mode">Timer mode:</label>
+    <input type="checkbox" name="mode" <%= timr %>/>
+  </div>
+  <div>
     <label for="random">Currently on:</label>
     <input type="checkbox" name="state" <%= on %>/>
   </div>
 
   <label for="physicalSocket">Physical socket: </label>
   <select name="physicalSocket">
-    <option value="">Select</option>
+    <option value="-1">Select</option>
     <option value="1" <%= soid===1 ? 'selected' : '' %>>1</option>
     <option value="2" <%= soid===2 ? 'selected' : '' %>>2</option>
     <option value="3" <%= soid===3 ? 'selected' : '' %>>3</option>
