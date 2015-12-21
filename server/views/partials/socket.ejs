@@ -4,7 +4,7 @@
   var on = socket.state ? 'checked' : '';
   var ontm = socket.onTime || '18:42';
   var oftm = socket.offTime || '23:33';
-  var soid = socket.physicalSocket || '1';
+  var soid = socket.physicalSocket;
   var rand = socket.random ? 'checked' : '';
   var rndb = socket.randomBreaks ? 'checked' : '';
 %>
@@ -20,7 +20,13 @@
   </div>
 
   <label for="physicalSocket">Physical socket: </label>
-  <input type="text" name="physicalSocket" value="<%= soid %>"/>
+  <select name="physicalSocket">
+    <option value="">Select</option>
+    <option value="1" <%= soid===1 ? 'selected' : '' %>>1</option>
+    <option value="2" <%= soid===2 ? 'selected' : '' %>>2</option>
+    <option value="3" <%= soid===3 ? 'selected' : '' %>>3</option>
+    <option value="4" <%= soid===4 ? 'selected' : '' %>>4</option>
+  </select>
   <div>
     <label>Time on: </label>
     <input type="text" class="short" name="onTime" value="<%= ontm %>"/>
