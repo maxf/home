@@ -3,8 +3,8 @@
   var desc = socket.description || '';
   var on = socket.switchedOn ? 'checked' : '';
   var timr = socket.timerMode ? 'checked' : '';
-  var ontm = socket.onTime || '18:42';
-  var oftm = socket.offTime || '23:33';
+  var start = socket.startTime || '18:00';
+  var end = socket.stopTime || '23:30';
   var soid = socket.physicalSocket;
   var rand = socket.random ? 'checked' : '';
   var rndb = socket.randomBreaks ? 'checked' : '';
@@ -37,12 +37,12 @@
   <fieldset style="display: <%= timr ? 'block' : 'none'%>">
 
     <div>
-      <label>Time on: </label>
-      <input type="text" class="short" name="onTime" value="<%= ontm %>"/>
+      <label for="start">Time on: </label>
+      <input type="text" class="short" name="start" value="<%= start %>"/>
     </div>
     <div>
-      <label>Time off: </label>
-      <input type="text" class="short" name="offTime" value="<%= oftm %>"/>
+      <label for="end">Time off: </label>
+      <input type="text" class="short" name="end" value="<%= end %>"/>
     </div>
     <div>
       <label for="random">Random start/end times</label>

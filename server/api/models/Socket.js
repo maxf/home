@@ -27,23 +27,13 @@ module.exports = {
       required: false,
       defaultsTo: false
     },
-    onTimeHour: {
+    startTime: { // when the socket gets switched on (in minutes after midnight)
       type: 'integer',
       required: true
     },
-    onTimeMinute: {
-      type: 'integer',
-      required: false,
-      defaultsTo: 0
-    },
-    offTimeHour: {
+    stopTime: { // when the socket gets switched off (in minutes after midnight)
       type: 'integer',
       required: true
-    },
-    offTimeMinute: {
-      type: 'integer',
-      required: false,
-      defaultsTo: 0
     },
     random: {
       type: 'boolean',

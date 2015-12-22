@@ -38,11 +38,11 @@
   function tick() {
     var now = new Date();
     var timeNow = secs(now.getHours(), now.getMinutes(), now.getSeconds());
-    sails.log('tick at', timeNow);
+    sails.log('tick at', now, timeNow);
     Socket.find().exec(function(err, sockets) {
       sockets.forEach(function(socket) {
-        var startTime = secs(socket.onTimeHour, socket.onTimeMinute, 0);
-        var endTime = secs(socket.offTimeHour, socket.offTimeMinute, 0);
+        var startTime = socket.startTime * 60;
+        var endTime = socket.stopTime * 60;
         var waitingTime = socket.random ? Math.random() * 100000 : 0;
 
         // if the socket is on and we're in off hours, turn it off
@@ -75,14 +75,14 @@
 
   module.exports.bootstrap = function(cb) {
     setTimeout(function() {
-      if (sails.config.globals.socketApiUrl) {
+      if (sails.config.globals.socketsApiUrl) {
         sails.log('Starting scheduler. Sockets URL is ',
-                  sails.config.globals.socketApiUrl);
+                  sails.config.globals.socketsApiUrl);
         setInterval(tick, 10000);
       } else {
         sails.log('Warning: SOCKETS_API_URL environment variable not defined. Not starting the scheduler');
       }
-    }, 5000);
+    }, 3000);
 
     // It's very important to trigger this callback method when you are finished
     // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
