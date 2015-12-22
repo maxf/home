@@ -1,3 +1,5 @@
+/* global Socket, SocketService, sails */
+
 /**
  * Bootstrap
  * (sails.config.bootstrap)
@@ -72,8 +74,15 @@
   }
 
   module.exports.bootstrap = function(cb) {
-    setInterval(tick, 10000);
-    sails.log('>>>', sails.config.globals.socketsApiUrl);
+    setTimeout(function() {
+      if (sails.config.globals.socketApiUrl) {
+        sails.log('Starting scheduler. Sockets URL is ',
+                  sails.config.globals.socketApiUrl);
+        setInterval(tick, 10000);
+      } else {
+        sails.log('Warning: SOCKETS_API_URL environment variable not defined. Not starting the scheduler');
+      }
+    }, 5000);
 
     // It's very important to trigger this callback method when you are finished
     // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
