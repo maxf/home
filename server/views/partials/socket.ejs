@@ -9,58 +9,59 @@
   var rand = socket.random ? 'checked' : '';
   var rndb = socket.randomBreaks ? 'checked' : '';
 %>
-
-<form action="/sockets/" method="post">
-  <input type="hidden" name="id" value="<%= id %>"/>
-  <div>
-    <label for="description">Description:</label>
-    <input type="text" name="description" value="<%= desc %>"/>
-  </div>
-  <div>
-    <label for="switchedOn">Currently on:</label>
-    <input type="checkbox" name="switchedOn" <%= on %>/>
-  </div>
-  <div>
-    <label for="timerMode">Timer mode:</label>
-    <input type="checkbox" name="timerMode" <%= timr %>/>
-  </div>
-  <div>
-    <label for="physicalSocket">Physical socket: </label>
-    <select name="physicalSocket">
-      <option value="-1">Select</option>
-      <option value="1" <%= soid===1 ? 'selected' : '' %>>1</option>
-      <option value="2" <%= soid===2 ? 'selected' : '' %>>2</option>
-      <option value="3" <%= soid===3 ? 'selected' : '' %>>3</option>
-      <option value="4" <%= soid===4 ? 'selected' : '' %>>4</option>
-    </select>
-  </div>
-  <fieldset style="display: <%= timr ? 'block' : 'none'%>">
-
+<div class="socket">
+    <form action="/sockets/" method="post">
+    <input type="hidden" name="id" value="<%= id %>"/>
     <div>
-      <label for="start">Time on: </label>
-      <input type="text" class="short" name="start" value="<%= start %>"/>
+        <label for="description">Description:</label>
+        <input type="text" name="description" value="<%= desc %>"/>
     </div>
     <div>
-      <label for="end">Time off: </label>
-      <input type="text" class="short" name="end" value="<%= end %>"/>
+        <label for="switchedOn">Currently on:</label>
+        <input type="checkbox" name="switchedOn" <%= on %>/>
     </div>
     <div>
-      <label for="random">Random start/end times</label>
-      <input type="checkbox" name="random" <%= rand %>/>
+        <label for="timerMode">Timer mode:</label>
+        <input type="checkbox" name="timerMode" <%= timr %>/>
     </div>
     <div>
-      <label for="randomBreaks">Random breaks</label>
-      <input type="checkbox" name="randomBreaks" <%= rndb %>/>
+        <label for="physicalSocket">Physical socket: </label>
+        <select name="physicalSocket">
+        <option value="-1">Select</option>
+        <option value="1" <%= soid===1 ? 'selected' : '' %>>1</option>
+        <option value="2" <%= soid===2 ? 'selected' : '' %>>2</option>
+        <option value="3" <%= soid===3 ? 'selected' : '' %>>3</option>
+        <option value="4" <%= soid===4 ? 'selected' : '' %>>4</option>
+        </select>
     </div>
-  </fieldset>
-  <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
+    <fieldset style="display: <%= timr ? 'block' : 'none'%>">
+
+        <div>
+        <label for="start">Time on: </label>
+        <input type="text" class="short" name="start" value="<%= start %>"/>
+        </div>
+        <div>
+        <label for="end">Time off: </label>
+        <input type="text" class="short" name="end" value="<%= end %>"/>
+        </div>
+        <div>
+        <label for="random">Random start/end times</label>
+        <input type="checkbox" name="random" <%= rand %>/>
+        </div>
+        <div>
+        <label for="randomBreaks">Random breaks</label>
+        <input type="checkbox" name="randomBreaks" <%= rndb %>/>
+        </div>
+    </fieldset>
+    <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
 
 
 
-</form>
-<% if (id) { %>
-<form action="/sockets/" method="post">
-  <input type="hidden" name="delete_id" value="<%= id %>"/>
-  <input type="submit" value="Delete"/>
-</form>
-<% } %>
+    </form>
+    <% if (id) { %>
+    <form action="/sockets/" method="post">
+    <input type="hidden" name="delete_id" value="<%= id %>"/>
+    <input type="submit" value="Delete"/>
+    </form>
+    <% } %>
+</div>

@@ -1,4 +1,13 @@
 body {
+
+  .socket {
+    display: inline-block;
+    width: 18em;
+    margin: 1em;
+    padding: .5em;
+    border: 1px solid blue;
+    background-color: cadetblue;
+  }
   input[type=text].short {
     width: 4em;
   }
