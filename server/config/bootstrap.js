@@ -23,23 +23,11 @@
     SocketService.modifySocket(socket.id, {switchedOn: !turnOff}, next);
   }
 
-  function setSocket(socket, turnOff) {
-    var url = sails.config.globals.socketsApiUrl + socket.physicalSocket +
-      '/' + (turnOff ? 'off' : 'on');
-    sails.log('Sending: ', url);
-
-    request(url, function (error, response, body) {
-      if (error || response.statusCode !== 200) {
-        sails.log('An error occurred when setting a socket: ', url);
-      }
-    });
-  }
-
   function tick() {
     var now = new Date();
     var timeNow = secs(now.getHours(), now.getMinutes(), now.getSeconds());
     sails.log('tick at', now, timeNow);
-    Socket.find().exec(function(err, sockets) {
+    Socket.find({timerMode: true}).exec(function(err, sockets) {
       sockets.forEach(function(socket) {
         var startTime = socket.startTime * 60;
         var endTime = socket.stopTime * 60;
@@ -50,18 +38,23 @@
         if (socket.switchedOn && (timeNow < startTime || timeNow > endTime)) {
           sails.log('Socket switch', timeNow, startTime, endTime);
           sails.log('waiting ', waitingTime + 'ms');
-          markSocket(socket, true, function () {
-            setTimeout(function() { setSocket(socket, true) }, waitingTime);
-          });
+          SocketService.modifySocket(socket.id, {switchedOn: false});
+
+          // markSocket(socket, true, function () {
+          //   setTimeout(function() {
+          //     SocketService.update(socket.id, {switchedOn: true});
+          //   }, waitingTime);
+          // });
         } else {
 
           // if the socket is off and we're in on hours, turn it on
           if (!socket.switchedOn && timeNow > startTime && timeNow < endTime) {
             sails.log('Socket switch', timeNow, startTime, endTime);
             sails.log('waiting ', waitingTime + 'ms');
-            markSocket(socket, false, function() {
-              setTimeout(function() { setSocket(socket, false) }, waitingTime);
-            });
+            // markSocket(socket, false, function() {
+            //   setTimeout(function() { setSocket(socket, false) }, waitingTime);
+            // });
+            SocketService.modifySocket(socket.id, {switchedOn: true});
           }
         }
       });
