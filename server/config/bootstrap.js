@@ -14,55 +14,68 @@
 (function () {
 
   var request = require('request');
+  var switchTimeouts = [];
 
   function secs(h, m, s) {
     return h*3600+m*60+s;
   }
 
-  function markSocket(socket, turnOff, next) {
-    SocketService.modifySocket(socket.id, {switchedOn: !turnOff}, next);
+  // switch a socket on or off, possibly after a delay if socket is random
+  function setSocket(socket, switchedOn) {
+    var delaySecs = socket.random ? Math.random() * 600 : 0
+    sails.log('SCHEDULER: socket "' + socket.description + '" switch ' + switchedOn + ' at ' + new Date() + ' + ' + delaySecs);
+    switchTimeouts[socket.id] = setTimeout(function() {
+      sails.log('SCHEDULER: switching socket "' + socket.description + '" now. ', new Date());
+      SocketService.modifySocket(socket.id, {switchedOn: switchedOn});
+      delete switchTimeouts[socket.id];
+    }, delaySecs*1000);
   }
 
   function tick() {
     var now = new Date();
     var timeNow = secs(now.getHours(), now.getMinutes(), now.getSeconds());
-    sails.log('tick at', now, timeNow);
+    sails.log('SCHEDULER: tick at', now, timeNow);
     Socket.find({timerMode: true}).exec(function(err, sockets) {
-      sockets.forEach(function(socket) {
-        var startTime = socket.startTime * 60;
-        var endTime = socket.stopTime * 60;
-        var waitingTime = socket.random ? Math.random() * 100000 : 0;
+      sockets
+        .filter(function(s) { return !switchTimeouts[s.id]; })
+        .forEach(function(socket) {
+          var startTime = socket.startTime * 60;
+          var endTime = socket.stopTime * 60;
 
-        // if the socket is on and we're in off hours, turn it off
-        // (before turning it off, if random, then wait rnd seconds)
-        if (socket.switchedOn && (timeNow < startTime || timeNow > endTime)) {
-          sails.log('Socket switch', timeNow, startTime, endTime);
-          sails.log('waiting ', waitingTime + 'ms');
-          SocketService.modifySocket(socket.id, {switchedOn: false});
-
-          // markSocket(socket, true, function () {
-          //   setTimeout(function() {
-          //     SocketService.update(socket.id, {switchedOn: true});
-          //   }, waitingTime);
-          // });
-        } else {
-
-          // if the socket is off and we're in on hours, turn it on
-          if (!socket.switchedOn && timeNow > startTime && timeNow < endTime) {
-            sails.log('Socket switch', timeNow, startTime, endTime);
-            sails.log('waiting ', waitingTime + 'ms');
-            // markSocket(socket, false, function() {
-            //   setTimeout(function() { setSocket(socket, false) }, waitingTime);
-            // });
-            SocketService.modifySocket(socket.id, {switchedOn: true});
+          // if the socket is on and we're in off hours, turn it off
+          // (before turning it off, if random, then wait rnd seconds)
+          if (socket.switchedOn && (timeNow < startTime || timeNow > endTime)) {
+            setSocket(socket, false);
+          } else {
+            // if the socket is off and we're in on hours, turn it on
+            if (!socket.switchedOn && timeNow > startTime && timeNow < endTime) {
+              setSocket(socket, true);
+            }
           }
-        }
-      });
+        })
+      ;
+    });
 
-      // if the socket is on and it's on hours and randomBreaks
-      // turn it on and off for a minute
-      // TODO
-
+    // Sockets with random breaks
+    Socket.find({randomBreaks: true}).exec(function(err, sockets) {
+      sockets
+        .filter(function(s) { return !switchTimeouts[s.id]; })
+        .forEach(function(socket) {
+          // is this socket in its off period?
+          if (timeNow < socket.startTime*60 || timeNow > socket.stopTime*60) {
+            // yes, so roll a dice
+            if (Math.random() > .9) {
+              // win! Let's turn on, wait a bit, then off
+              sails.log('SCHEDULER: random break at "' + socket.description + '"');
+              setSocket(socket, true);
+              switchTimeouts[socket.id] = setTimeout(function() {
+                setSocket(socket, false);
+                delete switchTimeouts[socket.id];
+              }, 50000 + Math.random()*120*1000);
+            }
+          }
+        })
+      ;
     });
   }
 
@@ -71,7 +84,7 @@
       if (sails.config.globals.socketsApiUrl) {
         sails.log('Starting scheduler. Sockets URL is ',
                   sails.config.globals.socketsApiUrl);
-        setInterval(tick, 10000);
+        setInterval(tick, 60000);
       } else {
         sails.log('Warning: SOCKETS_API_URL environment variable not defined. Not starting the scheduler');
       }
