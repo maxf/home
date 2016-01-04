@@ -75,7 +75,6 @@ module.exports = {
   modifySocket: function(socketId, newValue, next) {
     Socket.update({id: socketId}, newValue).exec(function(err, updated) {
       if(err) throw err;
-      sails.log(updated[0]);
       turnOnOrOffSocket(updated[0]);
       next && next(updated);
     });
