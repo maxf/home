@@ -35,6 +35,12 @@ var modelSocket = function(viewSocket) {
   };
 };
 
+var secs = function(h, m, s) {
+  return h*3600+m*60+s;
+}
+
+
+
 function turnOnOrOffSocket(socket) {
   var url = sails.config.globals.socketsApiUrl + socket.physicalSocket +
     '/' + (socket.switchedOn ? 'on' : 'off');
@@ -63,12 +69,14 @@ module.exports = {
     Socket.create(socketVal).exec(function(err, socket) {
       if(err) throw err;
       turnOnOrOffSocket(socket);
+      if (socket.timerMode) SchedulerService.update(socket);
       next && next(socket);
     });
   },
   removeSocket: function(socketId, next) {
     Socket.destroy(socketId).exec(function(err, socket) {
       if(err) throw err;
+      if (socket.timerMode) SchedulerService.update(socket);
       next && next(socket);
     });
   },
@@ -76,6 +84,7 @@ module.exports = {
     Socket.update({id: socketId}, newValue).exec(function(err, updated) {
       if(err) throw err;
       turnOnOrOffSocket(updated[0]);
+      if (updated.timerMode) SchedulerService.update(updated);
       next && next(updated);
     });
   },
@@ -101,6 +110,12 @@ module.exports = {
     this.modifySocket(socketVal.id, socket, function(success) {
       next(success);
     });
+  },
+
+  socketIsInHours: function() {
+    var now = new Date();
+    var timeNow = secs(now.getHours(), now.getMinutes(), now.getSeconds());
+    return !(timeNow < this.startTime*60 || timeNow > this.stopTime*60);
   }
 
 };
