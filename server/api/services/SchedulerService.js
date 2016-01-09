@@ -1,12 +1,17 @@
-/* global Utils, Socket */
+/* global Utils, Socket, sails */
 
 var scheduledOn = function(schedule, time) {
   var i;
   var interval;
   var keys = Object.keys(schedule);
-  for (i=0; i<keys.length; i++) {
-    interval = schedule[keys[i]];
-    if (time >= interval.start && time <= interval.end) return true;
+  if (keys) {
+    for (i=0; i<keys.length; i++) {
+      interval = schedule[keys[i]];
+      sails.log(interval.start, interval.stop)
+      if (time >= interval.start && time <= interval.stop) {
+        return true;
+      }
+    }
   }
   return false;
 };
@@ -21,49 +26,45 @@ var buildSchedule = function(socket) {
     var i;
     var breakStartMins;
     var breakStopMins;
-//    sails.log('---', socket.id, '---');
-//    sails.log(socket);
     s.push({start: Math.max(0, startTimeMins), stop: Math.min(stopTimeMins, 24*60)});
-//    sails.log('startTime:',startTimeMins);
-//    sails.log('stopTime:',stopTimeMins);
-//    sails.log(0,s);
     if (socket.randomBreaks) {
       for (i=0; i<10; i++) {
   	breakStartMins = Math.random()*24*60;
-	breakStopMins = Math.min(breakStartMins + Math.random()*20, 24*60);
-	s.push({start: breakStartMins, stop: breakStopMins});
-//	sails.log(i, s);
+    breakStopMins = Math.min(breakStartMins + Math.random()*20, 24*60);
+    s.push({start: breakStartMins, stop: breakStopMins});
       }
     }
-//    sails.log('---------');
   }
   return s;
 }
 
+var tick = function() {
+  var now = new Date();
+  var nowMins = now.getHours()*60 + now.getMinutes();
+  sails.log('SCHEDULER: tick at', now, nowMins);
+  Socket.find({timerMode: true}).exec(function(err, sockets) {
+    sockets.forEach(function(socket) {
+      SocketService.modifySocket(socket.id, { switchedOn: scheduledOn(schedule[socket.id], nowMins) } );
+    });
+  });
+}
+
 module.exports = {
 
-  tick: function() {
-    var now = new Date();
-    sails.log(schedule);
-    sails.log('SCHEDULER: tick at', now);
-    Socket.find({timerMode: true}).exec(function(err, sockets) {
-      sockets.forEach(function(socket) {
-	SocketService.modifySocket(socket.id, { switchedOn: scheduledOn(schedule[socket.id], now) } );	
-      });
-    });
-  },
+  tick: tick,
 
   // Compute a socket's schedule
   update: function(socket) {
-    sails.log('SCHEDULER: update', socket.id);
+    sails.log('SCHEDULER: update socket', socket.description);
     schedule[socket.id] = buildSchedule(socket);
   },
 
   updateAll: function(next) {
     Socket.find({timerMode: true}).exec(function(err, sockets) {
       sockets.forEach(function(socket) {
-	schedule[socket.id] = buildSchedule(socket);
+        schedule[socket.id] = buildSchedule(socket);
       });
+      tick();
       next && next(sockets);
     });
   },

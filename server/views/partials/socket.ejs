@@ -54,14 +54,21 @@
         <input type="checkbox" name="randomBreaks" <%= rndb %>/>
         </div>
 
-	<div><% 
-	if (schd) {
-  	  for (var i=0; i<schd.length; i++) { %>
-	    <p><%= schd[i].start %>, <%= schd[i].stop %></p>
-	    <% }} %>
-        </div>
+        <% if (schd) { %>
+          <svg viewBox="0 -50 1440 100">
+            <% var now = new Date(), nowMins = now.getHours()*60 + now.getMinutes(); %>
+            <rect x="0" y="-30" width="<%= nowMins %>" height="60" fill="yellow"/>
+            <line x1="0" y1="0" x2="1440" y2="0" stroke="black" stroke-width="5px"/>
+            <%   for (var i=0; i<schd.length; i++) { %>
+                   <rect x="<%= schd[i].start %>" y="-20"
+                         width="<%= schd[i].stop - schd[i].start %>" height="40"
+                         fill="black"/>
+            <%   } %>
+          </svg>
+        <% } %>
 
     </fieldset>
+
     <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
 
 

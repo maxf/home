@@ -52,7 +52,7 @@ module.exports = {
       SocketService.getSocketsForView(function(socketsForView) {
         res.view('sockets', {
           sockets: socketsForView,
-	  schedules: SchedulerService.getSchedules()
+          schedules: SchedulerService.getSchedules()
         });
       });
     }
