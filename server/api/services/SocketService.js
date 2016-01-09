@@ -69,23 +69,36 @@ module.exports = {
     Socket.create(socketVal).exec(function(err, socket) {
       if(err) throw err;
       turnOnOrOffSocket(socket);
-      if (socket.timerMode) SchedulerService.update(socket);
-      next && next(socket);
+      if (socket.timerMode) { 
+	SchedulerService.update(socket);
+      }
+      next && next();
     });
   },
   removeSocket: function(socketId, next) {
     Socket.destroy(socketId).exec(function(err, socket) {
       if(err) throw err;
-      if (socket.timerMode) SchedulerService.update(socket);
-      next && next(socket);
+      if (socket.timerMode) {
+	SchedulerService.update(socket);
+      }
+      next && next();
     });
   },
   modifySocket: function(socketId, newValue, next) {
-    Socket.update({id: socketId}, newValue).exec(function(err, updated) {
-      if(err) throw err;
-      turnOnOrOffSocket(updated[0]);
-      if (updated.timerMode) SchedulerService.update(updated);
-      next && next(updated);
+    Socket.find({id: socketId}).exec(function(err, oldSockets) {
+      var oldSocket = oldSockets[0];
+      if (err) throw err;
+      Socket.update({id: socketId}, newValue).exec(function(err, updated) {
+	var newSocket = updated[0];
+	if (err) throw err;
+	turnOnOrOffSocket(newSocket);
+	if (newSocket.timerMode && (newSocket.startTime != oldSocket.startTime || newSocket.stopTime != oldSocket.stopTime || newSocket.random != oldSocket.random || newSocket.randomBreaks != oldSocket.randomBreaks)) {
+	  sails.log('rebuild schedule');
+	  sails.log(oldSocket, newSocket);
+	  SchedulerService.update(newSocket);
+	}
+	next && next(updated[0]);
+      });
     });
   },
 

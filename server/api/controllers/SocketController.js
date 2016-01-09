@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global SocketService, module */
+/* global SocketService, SchedulerService, module */
 
 module.exports = {
   getSockets: function(req, res) {
@@ -51,7 +51,8 @@ module.exports = {
     } else {
       SocketService.getSocketsForView(function(socketsForView) {
         res.view('sockets', {
-          sockets: socketsForView
+          sockets: socketsForView,
+	  schedules: SchedulerService.getSchedules()
         });
       });
     }

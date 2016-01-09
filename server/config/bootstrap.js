@@ -16,7 +16,9 @@ module.exports.bootstrap = function(cb) {
     if (sails.config.globals.socketsApiUrl) {
       sails.log('Starting scheduler. Sockets URL is ',
                 sails.config.globals.socketsApiUrl);
-      setInterval(SchedulerService.tick, 10000);
+      SchedulerService.updateAll(function() {
+        setInterval(SchedulerService.tick, 10000);
+      });
     } else {
       sails.log('Warning: SOCKETS_API_URL environment variable not defined. Not starting the scheduler');
     }

@@ -8,6 +8,7 @@
   var soid = socket.physicalSocket;
   var rand = socket.random ? 'checked' : '';
   var rndb = socket.randomBreaks ? 'checked' : '';
+  var schd = schedules[id];
 %>
 <div class="socket">
     <form action="/sockets/" method="post">
@@ -52,6 +53,14 @@
         <label for="randomBreaks">Random breaks</label>
         <input type="checkbox" name="randomBreaks" <%= rndb %>/>
         </div>
+
+	<div><% 
+	if (schd) {
+  	  for (var i=0; i<schd.length; i++) { %>
+	    <p><%= schd[i].start %>, <%= schd[i].stop %></p>
+	    <% }} %>
+        </div>
+
     </fieldset>
     <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
 
