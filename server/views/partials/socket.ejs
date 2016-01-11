@@ -17,8 +17,8 @@
         <label for="description">Description:</label>
         <input type="text" name="description" value="<%= desc %>"/>
     </div>
-    <div>
-        <label for="switchedOn">Currently on:</label>
+    <div style="display: <%= timr ? 'none' : 'block' %>">
+        <label for="switchedOn">On:</label>
         <input type="checkbox" name="switchedOn" <%= on %>/>
     </div>
     <div>

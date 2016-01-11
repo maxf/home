@@ -72,13 +72,13 @@ module.exports = {
       if (socket.timerMode) {
         SchedulerService.update(socket);
       }
-      next && next();
+      next && next(socket);
     });
   },
   removeSocket: function(socketId, next) {
     Socket.destroy(socketId).exec(function(err, socket) {
       if(err) throw err;
-      next && next();
+      next && next(socket);
     });
   },
   modifySocket: function(socketId, newValue, next) {
@@ -92,11 +92,10 @@ module.exports = {
         var newSocket = updated[0];
         if (err) throw err;
         if (newSocket.timerMode &&
-            (newSocket.startTime != oldSocket.startTime ||
+           (newSocket.startTime != oldSocket.startTime ||
             newSocket.stopTime != oldSocket.stopTime ||
-            newSocket.random != oldSocket.random ||
+            newSocket.random  != oldSocket.random ||
             newSocket.randomBreaks != oldSocket.randomBreaks)) {
-          sails.log('rebuild schedule');
           SchedulerService.update(newSocket);
         }
         turnOnOrOffSocket(newSocket);
@@ -116,16 +115,12 @@ module.exports = {
 
   addSocketFromView: function(socketVal, next) {
     var socket = modelSocket(socketVal);
-    this.addSocket(socket, function(success) {
-      next(success);
-    });
+    this.addSocket(socket, next);
   },
 
   modifySocketFromView: function(socketVal, next) {
     var socket = modelSocket(socketVal);
-    this.modifySocket(socketVal.id, socket, function(success) {
-      next(success);
-    });
+    this.modifySocket(socketVal.id, socket, next);
   },
 
   socketIsInHours: function() {
