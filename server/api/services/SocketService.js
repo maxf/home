@@ -1,4 +1,4 @@
-/* global Utils, Socket */
+/* global Utils, Socket, SchedulerService, sails */
 
 var Utils = require('../services/utils');
 var request = require('request');
@@ -85,21 +85,23 @@ module.exports = {
     Socket.find({id: socketId}).exec(function(err, oldSockets) {
       var oldSocket = oldSockets[0];
       if (err) throw err;
-
-      // We should update the socket's switchedOn with the new schedule
-
+      if (newValue.timerMode) {
+      // if (newValue.timerMode &&
+      //     (newValue.startTime != oldSocket.startTime ||
+      //      newValue.stopTime != oldSocket.stopTime ||
+      //      newValue.random  != oldSocket.random ||
+      //      newValue.randomBreaks != oldSocket.randomBreaks)) {
+        NEW VALUE SHOULD HAVE AN ID
+        sails.log(2, newValue, newValue.timerMode);
+        SchedulerService.update(newValue);
+        newValue.switchedOn = SchedulerService.scheduledToBeOn(socketId);
+      }
+      turnOnOrOffSocket(newValue);
+      sails.log(4);
+      sails.log(newValue);
       Socket.update({id: socketId}, newValue).exec(function(err, updated) {
-        var newSocket = updated[0];
         if (err) throw err;
-        if (newSocket.timerMode &&
-           (newSocket.startTime != oldSocket.startTime ||
-            newSocket.stopTime != oldSocket.stopTime ||
-            newSocket.random  != oldSocket.random ||
-            newSocket.randomBreaks != oldSocket.randomBreaks)) {
-          SchedulerService.update(newSocket);
-        }
-        turnOnOrOffSocket(newSocket);
-        next && next(updated[0]);
+        next && next(updated);
       });
     });
   },
