@@ -1,7 +1,6 @@
 /* global Utils, Socket, sails */
 
 var scheduledOn = function(schedule, time) {
-  sails.log('scheduledOn',schedule,time);
   var i;
   var interval;
   var keys = Object.keys(schedule);
@@ -9,12 +8,10 @@ var scheduledOn = function(schedule, time) {
     for (i=0; i<keys.length; i++) {
       interval = schedule[keys[i]];
       if (time >= interval.start && time <= interval.stop) {
-        sails.log(true);
         return true;
       }
     }
   }
-  sails.log(false)
   return false;
 };
 

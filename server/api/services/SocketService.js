@@ -86,19 +86,10 @@ module.exports = {
       var oldSocket = oldSockets[0];
       if (err) throw err;
       if (newValue.timerMode) {
-      // if (newValue.timerMode &&
-      //     (newValue.startTime != oldSocket.startTime ||
-      //      newValue.stopTime != oldSocket.stopTime ||
-      //      newValue.random  != oldSocket.random ||
-      //      newValue.randomBreaks != oldSocket.randomBreaks)) {
-        NEW VALUE SHOULD HAVE AN ID
-        sails.log(2, newValue, newValue.timerMode);
         SchedulerService.update(newValue);
         newValue.switchedOn = SchedulerService.scheduledToBeOn(socketId);
       }
       turnOnOrOffSocket(newValue);
-      sails.log(4);
-      sails.log(newValue);
       Socket.update({id: socketId}, newValue).exec(function(err, updated) {
         if (err) throw err;
         next && next(updated);
