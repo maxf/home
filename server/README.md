@@ -13,3 +13,10 @@ To test:
 ```
 psql home  -h 127.0.0.1 -d home
 ```
+
+- reset schedules at midnight
+- monitoring
+- show schedule in popup
+- auto/manual control
+- CSS
+- JS 
