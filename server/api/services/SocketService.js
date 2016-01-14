@@ -22,6 +22,7 @@ var viewSocket = function(socket) {
 
 var modelSocket = function(viewSocket) {
   return {
+    id: viewSocket.id,
     description: viewSocket.description,
     physicalSocket: parseInt(viewSocket.physicalSocket, 10),
     switchedOn: viewSocket.switchedOn === 'on',

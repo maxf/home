@@ -43,7 +43,9 @@ var tick = function() {
   sails.log('SCHEDULER: tick at', now, nowMins);
   Socket.find({timerMode: true}).exec(function(err, sockets) {
     sockets.forEach(function(socket) {
-      SocketService.modifySocket(socket.id, { switchedOn: scheduledOn(schedule[socket.id], nowMins) } );
+      var updatedSocket = socket;
+      updatedSocket.switchedOn =  scheduledOn(schedule[socket.id], nowMins);
+      SocketService.modifySocket(socket.id, updatedSocket );
     });
   });
 }
