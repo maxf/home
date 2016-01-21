@@ -1,5 +1,7 @@
 /* global Utils, Socket, sails */
 
+var Utils = require('./utils');
+
 var scheduledOn = function(schedule, time) {
   var i;
   var interval;
@@ -78,6 +80,17 @@ module.exports = {
 
   getSchedules: function() {
     return schedule;
+  },
+
+  getScheduleText: function(id) {
+    var r;
+    if (id in schedule) {
+      r = schedule[id].map(function(segment) {
+        return Utils.minsToString(segment.start) + ' - ' + Utils.minsToString(segment.stop);
+      });
+      r.sort();
+    } else r = [];
+    return r;
   }
 
 };

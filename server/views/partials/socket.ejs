@@ -9,6 +9,7 @@
   var rand = socket.random ? 'checked' : '';
   var rndb = socket.randomBreaks ? 'checked' : '';
   var schd = schedules[id];
+  var scht = SchedulerService.getScheduleText(id).join('&#13;');
 %>
 <div class="socket">
     <form action="/sockets/" method="post">
@@ -55,7 +56,7 @@
         </div>
 
         <% if (schd) { %>
-          <svg viewBox="0 -50 1440 100">
+          <svg viewBox="0 -50 1440 100" title="<%= scht %>">
             <% var now = new Date(), nowMins = now.getHours()*60 + now.getMinutes(); %>
             <rect x="0" y="-30" width="<%= nowMins %>" height="60" fill="yellow"/>
             <line x1="0" y1="0" x2="1440" y2="0" stroke="black" stroke-width="5px"/>

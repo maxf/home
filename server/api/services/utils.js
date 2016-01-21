@@ -17,5 +17,13 @@ module.exports = {
     return { h: Math.floor(mins / 60),
              m: Math.floor(mins % 60)
            };
+  },
+
+  minsToString: function(mins) {
+    var h = Math.floor(mins / 60);
+    var m = Math.floor(mins % 60);
+
+    return this.pad(h, 2) + ':' + this.pad(m, 2);
   }
+
 };
