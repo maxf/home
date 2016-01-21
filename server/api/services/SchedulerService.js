@@ -29,7 +29,7 @@ var buildSchedule = function(socket) {
     if (socket.randomBreaks) {
       for (i=0; i<10; i++) {
   	breakStartMins = Math.random()*24*60;
-    breakStopMins = Math.min(breakStartMins + Math.random()*20, 24*60);
+    breakStopMins = Math.min(breakStartMins + 1 + Math.random()*19, 24*60);
     s.push({start: breakStartMins, stop: breakStopMins});
       }
     }
