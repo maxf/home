@@ -1,8 +1,8 @@
 <%
   var id = socket.id || '';
   var desc = socket.description || '';
-  var on = socket.switchedOn ? 'checked' : '';
-  var timr = socket.timerMode ? 'checked' : '';
+  var on = socket.switchedOn;
+  var timr = socket.timerMode;
   var start = socket.startTime || '18:00';
   var end = socket.stopTime || '23:30';
   var soid = socket.physicalSocket;
@@ -14,19 +14,24 @@
 <div class="socket">
     <form action="/sockets/" method="post">
     <input type="hidden" name="id" value="<%= id %>"/>
-    <div>
+    <div class="description">
         <label for="description">Description:</label>
         <input type="text" name="description" value="<%= desc %>"/>
     </div>
-    <div style="display: <%= timr ? 'none' : 'block' %>">
-        <label for="switchedOn">On:</label>
-        <input type="checkbox" name="switchedOn" <%= on %>/>
+    <div class="timerMode">
+        Manual:
+        <input type="radio" name="timerMode" value="off" <%= timr ? '' : 'checked' %>/>
+	Timer:
+        <input type="radio" name="timerMode" value="on" <%= timr ? 'checked' : '' %>/>
     </div>
-    <div>
-        <label for="timerMode">Timer mode:</label>
-        <input type="checkbox" name="timerMode" <%= timr %>/>
+
+    <div class="switchedOn" style="display: <%= timr ? 'none' : 'block' %>">
+        On:
+        <input type="radio" name="switchedOn" value="on" <%= on ? 'checked' : '' %>/>
+	Off:
+        <input type="radio" name="switchedOn" value="off" <%= on ? '' : 'checked' %>/>
     </div>
-    <div>
+    <div class="physicalSocket">
         <label for="physicalSocket">Physical socket: </label>
         <select name="physicalSocket">
         <option value="-1">Select</option>
@@ -36,23 +41,22 @@
         <option value="4" <%= soid===4 ? 'selected' : '' %>>4</option>
         </select>
     </div>
-    <fieldset style="display: <%= timr ? 'block' : 'none'%>">
-
+    <fieldset class="timer" style="display: <%= timr ? 'block' : 'none'%>">
         <div>
-        <label for="start">Time on: </label>
-        <input type="text" class="short" name="start" value="<%= start %>"/>
+            <label for="start">Time on: </label>
+            <input type="text" class="short" name="start" value="<%= start %>"/>
         </div>
         <div>
-        <label for="end">Time off: </label>
-        <input type="text" class="short" name="end" value="<%= end %>"/>
+            <label for="end">Time off: </label>
+            <input type="text" class="short" name="end" value="<%= end %>"/>
         </div>
         <div>
-        <label for="random">Random start/end times</label>
-        <input type="checkbox" name="random" <%= rand %>/>
+            <label for="random">Random start/end times</label>
+            <input type="checkbox" name="random" <%= rand %>/>
         </div>
         <div>
-        <label for="randomBreaks">Random breaks</label>
-        <input type="checkbox" name="randomBreaks" <%= rndb %>/>
+            <label for="randomBreaks">Random breaks</label>
+            <input type="checkbox" name="randomBreaks" <%= rndb %>/>
         </div>
 
         <% if (schd) { %>
