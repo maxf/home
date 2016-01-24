@@ -15,74 +15,66 @@
     <form action="/sockets/" method="post">
     <input type="hidden" name="id" value="<%= id %>"/>
     <div class="description">
-        <label for="description">Description:</label>
-        <input type="text" name="description" value="<%= desc %>"/>
-    </div>
-    <div class="timerMode">
-        Manual:
-        <input type="radio" name="timerMode" value="off" <%= timr ? '' : 'checked' %>/>
-	Timer:
-        <input type="radio" name="timerMode" value="on" <%= timr ? 'checked' : '' %>/>
+      <input type="text" name="description" value="<%= desc %>" placeholder="description"/>
     </div>
 
-    <div class="switchedOn" style="display: <%= timr ? 'none' : 'block' %>">
-        On:
-        <input type="radio" name="switchedOn" value="on" <%= on ? 'checked' : '' %>/>
-	Off:
-        <input type="radio" name="switchedOn" value="off" <%= on ? '' : 'checked' %>/>
-    </div>
-    <div class="physicalSocket">
-        <label for="physicalSocket">Physical socket: </label>
-        <select name="physicalSocket">
-        <option value="-1">Select</option>
-        <option value="1" <%= soid===1 ? 'selected' : '' %>>1</option>
-        <option value="2" <%= soid===2 ? 'selected' : '' %>>2</option>
-        <option value="3" <%= soid===3 ? 'selected' : '' %>>3</option>
-        <option value="4" <%= soid===4 ? 'selected' : '' %>>4</option>
-        </select>
-    </div>
-    <fieldset class="timer" style="display: <%= timr ? 'block' : 'none'%>">
-        <div>
-            <label for="start">Time on: </label>
-            <input type="text" class="short" name="start" value="<%= start %>"/>
-        </div>
-        <div>
-            <label for="end">Time off: </label>
-            <input type="text" class="short" name="end" value="<%= end %>"/>
-        </div>
-        <div>
-            <label for="random">Random start/end times</label>
-            <input type="checkbox" name="random" <%= rand %>/>
-        </div>
-        <div>
-            <label for="randomBreaks">Random breaks</label>
-            <input type="checkbox" name="randomBreaks" <%= rndb %>/>
-        </div>
+    <div class="timerMode"><label for="timerMode">Timer: </label><input type="checkbox" name="timerMode" <%= timr ? 'checked' : '' %> data-size="mini"/></div>
 
-        <% if (schd) { %>
-          <svg viewBox="0 -50 1440 100" title="<%= scht %>">
-            <% var now = new Date(), nowMins = now.getHours()*60 + now.getMinutes(); %>
-            <rect x="0" y="-30" width="<%= nowMins %>" height="60" fill="yellow"/>
-            <line x1="0" y1="0" x2="1440" y2="0" stroke="black" stroke-width="5px"/>
-            <%   for (var i=0; i<schd.length; i++) { %>
-                   <rect x="<%= schd[i].start %>" y="-20"
-                         width="<%= schd[i].stop - schd[i].start %>" height="40"
-                         fill="black"/>
-            <%   } %>
-          </svg>
-        <% } %>
+    <div class="switchedOn"><label for="switchedOn">Switch: </label><input type="checkbox" name="switchedOn" <%= on ? 'checked' : '' %> data-size="mini"/></div>
+
+    <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
+    <div class="advanced-trigger"><a href="#">Advanced</a></div>
+    <fieldset class="advanced">
+	<div class="physicalSocket">
+	    <label for="physicalSocket">Physical socket: </label>
+	    <select name="physicalSocket">
+	    <option value="-1">Select</option>
+	    <option value="1" <%= soid===1 ? 'selected' : '' %>>1</option>
+	    <option value="2" <%= soid===2 ? 'selected' : '' %>>2</option>
+	    <option value="3" <%= soid===3 ? 'selected' : '' %>>3</option>
+	    <option value="4" <%= soid===4 ? 'selected' : '' %>>4</option>
+	    </select>
+	</div>
+	<div class="timer"  style="display: <%= timr ? 'block' : 'none'%>">
+	    <div>
+		<label for="start">Time on: </label>
+		<input type="text" class="short" name="start" value="<%= start %>"/>
+	    </div>
+	    <div>
+		<label for="end">Time off: </label>
+		<input type="text" class="short" name="end" value="<%= end %>"/>
+	    </div>
+	    <div>
+		<label for="random">Random start/end times</label>
+		<input type="checkbox" name="random" <%= rand %>/>
+	    </div>
+	    <div>
+		<label for="randomBreaks">Random breaks</label>
+		<input type="checkbox" name="randomBreaks" <%= rndb %>/>
+	    </div>
+
+	    <% if (schd) { %>
+	      <svg viewBox="0 -50 1440 100" title="<%= scht %>">
+		<% var now = new Date(), nowMins = now.getHours()*60 + now.getMinutes(); %>
+		<rect x="0" y="-30" width="<%= nowMins %>" height="60" fill="yellow"/>
+		<line x1="0" y1="0" x2="1440" y2="0" stroke="black" stroke-width="5px"/>
+		<%   for (var i=0; i<schd.length; i++) { %>
+		       <rect x="<%= schd[i].start %>" y="-20"
+			     width="<%= schd[i].stop - schd[i].start %>" height="40"
+			     fill="black"/>
+		<%   } %>
+	      </svg>
+	    <% } %>
+	</div>
+	<% if (id) { %>
+	<form action="/sockets/" method="post">
+	<input type="hidden" name="delete_id" value="<%= id %>"/>
+	<input type="submit" value="Delete this socket"/>
+	</form>
+	<% } %>
+
 
     </fieldset>
 
-    <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
-
-
-
     </form>
-    <% if (id) { %>
-    <form action="/sockets/" method="post">
-    <input type="hidden" name="delete_id" value="<%= id %>"/>
-    <input type="submit" value="Delete"/>
-    </form>
-    <% } %>
 </div>

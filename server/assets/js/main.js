@@ -1,15 +1,35 @@
 $(function() {
 
-  $('.socket input[name=timerMode]').on('change', timerModeChange);
+  var $advancedTrigger = $('.advanced-trigger');
 
+  $('.advanced').hide();
 
-  function timerModeChange(event) {
+  $('.advanced-trigger').on('click', function() {
+    $(this).next('.advanced').toggle();
+  });
+
+  $("[name='timerMode']").bootstrapSwitch({onSwitchChange: timerModeChange});
+
+  $("[name='switchedOn']").bootstrapSwitch({onSwitchChange: switchChange});
+
+  function switchChange(event, state) {
+    var $socket = $(event.target).parents('.socket');
+    var socketId = $socket.find('form input[name=id]').val();
+    $.ajax({
+      url: '/socket/' + socketId,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: '{ "switchedOn": ' + state + ' }'
+    });
+  }
+
+  function timerModeChange(event, state) {
     var $socket = $(event.target).parents('.socket');
     var $timerCtrl = $socket.find('.timer');
     var $onOffCtrl = $socket.find('.switchedOn');
     var socketId = $socket.find('form input[name=id]').val();
 
-    if (event.target.value === 'on') {
+    if (state) {
       $.ajax({
 	url: '/socket/' + socketId,
 	type: 'PUT',
