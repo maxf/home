@@ -15,7 +15,8 @@ module.exports = {
     },
     physicalSocket: {
       type: 'integer',
-      required: true
+      required: false,
+      defaultsTo: -1
     },
     timerMode: {
       type: 'boolean',
@@ -29,11 +30,13 @@ module.exports = {
     },
     startTime: { // when the socket gets switched on (in minutes after midnight)
       type: 'integer',
-      required: true
+      defaultsTo: 0,
+      required: false
     },
     stopTime: { // when the socket gets switched off (in minutes after midnight)
       type: 'integer',
-      required: true
+      defaultsTo: 24*60,
+      required: false
     },
     random: {
       type: 'boolean',

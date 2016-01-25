@@ -30,9 +30,9 @@ var buildSchedule = function(socket) {
     s.push({start: Math.max(0, startTimeMins), stop: Math.min(stopTimeMins, 24*60)});
     if (socket.randomBreaks) {
       for (i=0; i<10; i++) {
-  	breakStartMins = Math.random()*24*60;
-    breakStopMins = Math.min(breakStartMins + 1 + Math.random()*19, 24*60);
-    s.push({start: breakStartMins, stop: breakStopMins});
+        breakStartMins = Math.random()*24*60;
+        breakStopMins = Math.min(breakStartMins + 1 + Math.random()*19, 24*60);
+        s.push({start: breakStartMins, stop: breakStopMins});
       }
     }
   }

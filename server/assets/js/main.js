@@ -13,14 +13,7 @@ $(function() {
   $("[name='switchedOn']").bootstrapSwitch({onSwitchChange: switchChange});
 
   function switchChange(event, state) {
-    var $socket = $(event.target).parents('.socket');
-    var socketId = $socket.find('form input[name=id]').val();
-    $.ajax({
-      url: '/socket/' + socketId,
-      type: 'PUT',
-      contentType: 'application/json',
-      data: '{ "switchedOn": ' + state + ' }'
-    });
+    $(event.target).parents('form').submit()
   }
 
   function timerModeChange(event, state) {

@@ -21,19 +21,29 @@ var viewSocket = function(socket) {
 };
 
 var modelSocket = function(viewSocket) {
-  return {
-    id: viewSocket.id,
+  var r = {
     description: viewSocket.description,
     physicalSocket: parseInt(viewSocket.physicalSocket, 10),
     switchedOn: viewSocket.switchedOn === 'on',
     timerMode: viewSocket.timerMode === 'on',
-    startTime: Utils.hmToMins(viewSocket.start.slice(0,2),
-                            viewSocket.start.slice(3,5)),
-    stopTime: Utils.hmToMins(viewSocket.end.slice(0,2),
-                            viewSocket.end.slice(3,5)),
     random: viewSocket.random === 'on',
     randomBreaks: viewSocket.randomBreaks === 'on'
   };
+  if (viewSocket.physicalSocket) {
+    r.physicalSocket = viewSocket.physicalSocket;
+  }
+  if (viewSocket.start) {
+    r.startTime = Utils.hmToMins(viewSocket.start.slice(0,2),
+                                 viewSocket.start.slice(3,5))
+  }
+  if (viewSocket.end) {
+    r.stopTime = Utils.hmToMins(viewSocket.end.slice(0,2),
+                                viewSocket.end.slice(3,5))
+  }
+  if (viewSocket.id) {
+    r.id = viewSocket.id;
+  }
+  return r;
 };
 
 var secs = function(h, m, s) {
@@ -43,15 +53,18 @@ var secs = function(h, m, s) {
 
 
 function turnOnOrOffSocket(socket) {
-  var url = sails.config.globals.socketsApiUrl + socket.physicalSocket +
-    '/' + (socket.switchedOn ? 'on' : 'off');
-  sails.log('Sending: ', url);
+  var url;
+  if (sails.config.globals.socketsApiUrl) {
+    url = sails.config.globals.socketsApiUrl + socket.physicalSocket +
+      '/' + (socket.switchedOn ? 'on' : 'off');
+    sails.log('Sending: ', url);
 
-  request(url, function (error, response, body) {
-    if (error || response.statusCode !== 200) {
-      sails.log('An error occurred when setting a socket: ', url);
-    }
-  });
+    request(url, function (error, response, body) {
+      if (error || response.statusCode !== 200) {
+        sails.log('An error occurred when setting a socket: ', url);
+      }
+    });
+  }
 }
 
 module.exports = {
@@ -86,7 +99,11 @@ module.exports = {
     Socket.find({id: socketId}).exec(function(err, oldSockets) {
       var oldSocket = oldSockets[0];
       if (err) throw err;
-      if (newValue.timerMode) {
+      if (newValue.timerMode != oldSocket.timerMode ||
+	  newValue.startTime != oldSocket.startTime ||
+	  newValue.stopTime != oldSocket.stopTime ||
+	  newValue.random != oldSocket.random ||
+	  newValue.randomBreaks != oldSocket.randomBreaks) {
         SchedulerService.update(newValue);
         newValue.switchedOn = SchedulerService.scheduledToBeOn(socketId);
       }

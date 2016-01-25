@@ -14,7 +14,7 @@ module.exports = {
     });
   },
   addSocket: function(req, res) {
-    var socketVal = (req.body.value) ? req.body.value : undefined;
+    var socketVal = req.body.value ? req.body.value : undefined;
     SocketService.addSocket(socketVal, function(success) {
       res.json(success);
     });
