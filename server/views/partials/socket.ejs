@@ -26,7 +26,6 @@
     <div class="switchedOn" style="display: <%= timr ? 'none' : 'block' %>"><label for="switchedOn">Switch: </label><input type="checkbox" name="switchedOn" <%= on ? 'checked' : '' %> data-size="mini"/></div>
     <% } %>
 
-    <input type="submit" value="<%= id ? 'Change' : 'Add' %>"/>
     <div class="advanced-trigger"><a href="#">Advanced</a></div>
     <fieldset class="advanced">
         <div class="physicalSocket">
@@ -76,9 +75,12 @@
         <input type="submit" value="Delete this socket"/>
         </form>
         <% } %>
-
-
+        <input type="submit" value="Change"/>
     </fieldset>
+
+    <% if (!id) { %>
+        <input type="submit" value="Add"/>
+    <% } %>
 
     </form>
 </div>

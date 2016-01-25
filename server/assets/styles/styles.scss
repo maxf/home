@@ -8,6 +8,10 @@ body {
     border: 1px solid blue;
     background-color: #CCF;
 
+    input[name=description] {
+      width: 100%;
+    }
+
     .timerMode, .switchedOn {
       margin: .4em 0;
 
