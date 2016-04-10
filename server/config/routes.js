@@ -36,6 +36,30 @@ module.exports.routes = {
     view: 'homepage'
   },
 
+  '/media': function(req, res) {
+    var dirContents = fs
+      .readdirSync('public/images/media')
+      .filter(function(fileName) { return /^[-_0-9.]+\.jpg/.test(fileName); })
+      .map(function(fileName) {
+        var filePrefix = fileName.match(/^([-_0-9.]+)\.jpg/)[1];
+        return {'filePrefix': filePrefix,
+                'href': '/images/media/'+filePrefix,
+                'date': fileName.substr(0, 10) };
+      });
+    res.json(dirContents);
+  }
+
+
+// router.get('/:date', function(req, res, next) {
+//   var date = req.params.date;
+//   var dirContents = fs
+//     .readdirSync('public/images/media')
+//     .filter(function(fileName) {
+//       var re=new RegExp('^'+date+'.*\.jpg$');
+//       return re.test(fileName); }) ;
+//   res.json(dirContents);
+// });
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
