@@ -20,6 +20,8 @@
  * http://sailsjs.org/#!/documentation/concepts/Routes/RouteTargetSyntax.html
  */
 
+var fs = require('fs');
+
 module.exports.routes = {
 
   /***************************************************************************
@@ -37,17 +39,18 @@ module.exports.routes = {
   },
 
   '/media': function(req, res) {
+    var fileNameRe = new RegExp("^[0-9]+-([0-9]{14})-[0-9]+\.jpg$");
     var dirContents = fs
-      .readdirSync('public/images/media')
-      .filter(function(fileName) { return /^[-_0-9.]+\.jpg/.test(fileName); })
+      .readdirSync('assets/media')
+      .filter(function(fileName) { return fileNameRe.test(fileName); })
       .map(function(fileName) {
-        var filePrefix = fileName.match(/^([-_0-9.]+)\.jpg/)[1];
-        return {'filePrefix': filePrefix,
-                'href': '/images/media/'+filePrefix,
-                'date': fileName.substr(0, 10) };
+        var matches = fileName.match(fileNameRe);
+        console.log(matches);
+        return {'src': '/media/'+matches[0],
+                'date': matches[1]};
       });
     res.json(dirContents);
-  }
+  },
 
 
 // router.get('/:date', function(req, res, next) {
