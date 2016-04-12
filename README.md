@@ -23,6 +23,7 @@ Shall the new role be a superuser? (y/n) n
 Shall the new role be allowed to create databases? (y/n) y
 Shall the new role be allowed to create more new roles? (y/n) n
 
+$ createdb -O home home
 
 ```
 Edit the file called `server/config/models.js` and change `migrate: 'safe',` to `migrate: 'drop',`.
@@ -36,7 +37,7 @@ $ npm install
 ```
 Edit the file called `server/config/models.js` and change `migrate: 'safe',` to `migrate: 'drop',`.
 ```
-$ sails lift
+$ node_modules/.bin/sails lift
 ```
 After you've run `sails lift` for the first time, revert the file change above.
 This is a bit of a hassle, but apparently purposeful so users won't accidentally delete their db.
