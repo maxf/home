@@ -39,17 +39,29 @@ module.exports.routes = {
   },
 
   '/media': function(req, res) {
-    var fileNameRe = new RegExp("^[0-9]+-([0-9]{14})-[0-9]+\.jpg$");
-    var dirContents = fs
+    var resultObj = {}, resultArr = [];
+    var fileNameRe = new RegExp("^([0-9]+)-[0-9]{14}(-[0-9]+)?\.(jpg|avi)$");
+    fs
       .readdirSync('assets/media')
       .filter(function(fileName) { return fileNameRe.test(fileName); })
-      .map(function(fileName) {
+      .forEach(function(fileName) {
         var matches = fileName.match(fileNameRe);
-        console.log(matches);
-        return {'src': '/media/'+matches[0],
-                'date': matches[1]};
+        if (!resultObj[matches[1]]) {
+          resultObj[matches[1]] = {};
+        }
+        resultObj[matches[1]].index = matches[1];
+        resultObj[matches[1]][matches[3]] = fileName;
       });
-    res.json(dirContents);
+    for (var key in resultObj) {
+      console.log(key)
+      if (resultObj[key].jpg && resultObj[key].avi) {
+        var match = resultObj[key].jpg.match(/^[0-9]+-([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})-[0-9]+\.jpg$/);
+        console.log(match)
+        resultObj[key].date = match[1]+'-'+match[2]+'-'+match[3]+'_'+match[4]+'.'+match[5]+'.'+match[6];
+        resultArr.push(resultObj[key]);
+      }
+    }
+    res.json(resultArr);
   },
 
 
