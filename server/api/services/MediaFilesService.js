@@ -52,10 +52,8 @@ module.exports = {
         resultObj[matches[1]][matches[3]] = fileName;
       });
     for (var key in resultObj) {
-      console.log(key)
       if (resultObj[key].jpg && resultObj[key].avi) {
         var match = resultObj[key].jpg.match(/^[0-9]+-([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})-[0-9]+\.jpg$/);
-        console.log(match)
         resultObj[key].date = match[1]+'-'+match[2]+'-'+match[3]+'_'+match[4]+'.'+match[5]+'.'+match[6];
         resultArr.push(resultObj[key]);
       }

@@ -17,7 +17,7 @@ body {
 
       label {
         display: inline-block;
-	width: 7em;
+	      width: 7em;
       }
 
     }
@@ -36,61 +36,60 @@ body {
   }
 
   #cctv {
-
     svg {
-    background-color: #ddd;
+      background-color: #ddd;
     }
 
     circle.visible {
-    stroke: none;
-    fill: #3AAF7B;
-    pointer-events: none;
+      stroke: none;
+      fill: #3AAF7B;
+      pointer-events: none;
     }
 
     circle.event-target {
-    opacity: 0;
+      opacity: 0;
     }
 
     /* axes */
     .domain {
-    fill: none;
-    stroke-width: 1px;
-    stroke: black;
+      fill: none;
+      stroke-width: 1px;
+      stroke: black;
     }
 
     .tick line {
-    stroke: black;
-    stroke-width: 1px;
+      stroke: black;
+      stroke-width: 1px;
     }
 
     /* intervals */
     rect.interval {
-    fill: #FAF6CD;
-    stroke: #eee;
-    stroke-width: 1px;
+      fill: #FAF6CD;
+      stroke: #eee;
+      stroke-width: 1px;
     }
 
     rect.interval2 {
-    fill: #DDDDFF;
-    stroke: #eee;
-    stroke-width: 1px;
-    opacity: .5;
+      fill: #DDDDFF;
+      stroke: #eee;
+      stroke-width: 1px;
+      opacity: .5;
     }
 
     #dot {
-    overflow: visible;
+      overflow: visible;
     }
 
     #tooltip {
-    display: none;
-    position: absolute;
-    font-size: 15px;
-    padding: 2px 5px 2px 5px;
-    background-color: #ECB438;
+      display: none;
+      position: absolute;
+      font-size: 15px;
+      padding: 2px 5px 2px 5px;
+      background-color: #ECB438;
     }
 
-    #tooltip img {
-    width: 200px;
+    #vidlink img {
+      width: 200px;
     }
 
     #tooltip div.title {
