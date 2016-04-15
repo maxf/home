@@ -34,7 +34,17 @@ var jsFilesToInject = [
 
   // All of the rest of your client-side js files
   // will be injected here in no particular order.
-  'js/**/*.js',
+  //'js/**/*.js',
+
+  '/js/dependencies/sails.io.js',
+  '/js/jquery.js',
+  '/js/bootstrap-switch.min.js',
+  '/js/bootstrap.js',
+  '/js/bootstrap.min.js',
+  '/js/d3.js',
+  '/js/cctv.js',
+  '/js/main.js',
+  '/js/toggles.min.js'
 
   // Use the "exclude" operator to ignore files
   // '!js/ignore/these/files/*.js'
