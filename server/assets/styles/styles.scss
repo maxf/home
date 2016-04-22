@@ -40,6 +40,11 @@ body {
       background-color: #ddd;
     }
 
+    .work-hours {
+      stroke: none;
+      fill: #FEF8AE;
+    }
+
     circle.visible {
       stroke: none;
       fill: #3AAF7B;
@@ -84,6 +89,7 @@ body {
       display: none;
       position: absolute;
       font-size: 15px;
+      width: 210px;
       padding: 2px 5px 2px 5px;
       background-color: #ECB438;
     }
@@ -92,14 +98,12 @@ body {
       width: 200px;
     }
 
-    #tooltip div.title {
-    float: left;
-    }
-
     #tooltip div.close {
-    float: right;
-    font-weight: bold;
-    cursor: pointer;
+      position: relative;
+      top: 0;
+      right: 0;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     #plot {
