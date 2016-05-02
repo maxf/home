@@ -39,7 +39,7 @@ module.exports.routes = {
   },
 
   '/media': function(req, res) {
-    res.json(MediaFilesService.grouped(fs.readdirSync('assets/media')));
+    res.json(MediaFilesService.grouped(fs.readdirSync('media')));
   },
 
 
