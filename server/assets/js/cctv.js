@@ -28,23 +28,32 @@
     return data.map(datum => {
       const date = new Date(
         datum.date.substring(0,4),
-        datum.date.substring(5,7) - 1,
+        datum.date.substring(4,6) - 1,
+        datum.date.substring(6,8),
         datum.date.substring(8,10),
-        datum.date.substring(11,13),
-        datum.date.substring(14,16),
-        datum.date.substring(17,19)
+        datum.date.substring(10,12),
+        datum.date.substring(12,14)
       );
       return { avi: datum.avi, jpg: datum.jpg, date: date};
     });
   }
 
+  function dateFromDateString(str) {
+    var matches = str.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+    return new Date(matches[1], matches[2]-1, matches[3], matches[4], matches[5], matches[6]);
+  }
+  function dayOnlyFromDateString(str) {
+    var matches = str.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+    return new Date(matches[1], matches[2]-1, matches[3]);
+  }
+  function timeFromDateString(str) {
+    var matches = str.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+    return (parseInt(matches[4]*3600, 10) + parseInt(matches[5]*60, 10) + parseInt(matches[6], 10)) / 3600;
+  }
+
   function dayScaleFromData(data) {
-    // find min and max dates and create a time scale from it
-    const dates = data
-      .map(datum => datum.date)
-      .sort((a,b) => b - a);
-    const maxDate = dates[0];
-    const minDate = dateOnly(dates[dates.length-1]);
+    const maxDate = dateOnly(data[data.length-1].date);
+    const minDate = dateOnly(data[0].date);
     return d3.time.scale()
       .domain([minDate, maxDate])
       .range([0, canvasWidth-100]);
@@ -82,7 +91,6 @@
           .attr('xlink:href', '#dot')
           .attr('x', d => scaleDay(dateOnly(d.date)))
           .attr('y', d => hoursScale(timeOfDay(d.date)))
-          .attr('data:date-time', d => d.date)
           .on('mouseover', d => {
             d3.select('#tooltip')
               .style('top', `${d3.event.pageY - 80}px`)
@@ -94,8 +102,9 @@
               .attr('src', `/media/${d.jpg}`);
             d3.select('#tooltip div.title')
               .text(displayTimeFormat(d.date));
-        });
-      });
+          });
+    });
+
   }
 
   main();
