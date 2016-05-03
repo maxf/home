@@ -12,7 +12,15 @@ module.exports = {
       return /\.avi$/.test(fileList[i+1]) ? fileList[i+1] : null;
     });
 
-    return jpegs.map(function(file, i) { return { date: file.substr(0, 14), jpg: file, avi: avis[i] }; });
+    return jpegs.map(function(file, i) {
+      var matches = file.match(/^([0-9]{14})-?([0-9]*)\.jpg$/);
+      return {
+        date: matches[1],
+        jpg: file,
+        diff: parseInt(matches[2], 10) || null,
+        avi: avis[i]
+      };
+    });
 
   }
 

@@ -34,8 +34,8 @@
         datum.date.substring(10,12),
         datum.date.substring(12,14)
       );
-      return { avi: datum.avi, jpg: datum.jpg, date: date};
-    });
+      return { avi: datum.avi, jpg: datum.jpg, date: date, diff: datum.diff };
+    }).sort((a, b) => a.diff - b.diff);
   }
 
   function dateFromDateString(str) {
@@ -78,19 +78,22 @@
         .append('g')
         .attr('transform', 'translate(54, 30)');
       const displayTimeFormat = d3.time.format('%d %b %Y, %H:%M');
-
+      const diffColours = d3.scale.linear()
+        .domain([0, 1])
+        .range(["green", "red"]);
       showWorkHours(plot, hoursScale);
       plot.append('g').call(timeAxis);
       plot.append('g').call(dayAxis);
 
-      plot.selectAll('use.dot')
+      plot.selectAll('circle.dot')
         .data(data)
         .enter()
-        .append('use')
+        .append('circle')
           .attr('class', 'dot')
-          .attr('xlink:href', '#dot')
-          .attr('x', d => scaleDay(dateOnly(d.date)))
-          .attr('y', d => hoursScale(timeOfDay(d.date)))
+          .attr('fill', d => diffColours(d.diff/1000000))
+          .attr('cx', d => scaleDay(dateOnly(d.date)))
+          .attr('cy', d => hoursScale(timeOfDay(d.date)))
+          .attr('r', d => 3+d.diff/1000000)
           .on('mouseover', d => {
             d3.select('#tooltip')
               .style('top', `${d3.event.pageY - 80}px`)
@@ -101,7 +104,7 @@
             d3.select('#tooltip img')
               .attr('src', `/media/${d.jpg}`);
             d3.select('#tooltip div.title')
-              .text(displayTimeFormat(d.date));
+              .text(displayTimeFormat(d.date)+' - '+((d.diff/10000).toFixed(0))+'%');
           });
     });
 
