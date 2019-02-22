@@ -1,0 +1,11 @@
+name: home
+root: ~/dev/home
+
+windows:
+  - main:
+      layout: main-vertical
+      panes:
+        - emacs -nw .
+        - export FLASK_APP=socket_server.py && flask run
+        - node_modules/.bin/sails lift
+        -
