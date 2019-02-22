@@ -2,3 +2,4 @@ npm-debug.log
 .sass-cache
 server/media
 .vagrant
+__pycache__
