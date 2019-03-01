@@ -14,14 +14,14 @@ module.exports = {
       defaultsTo: ''
     },
     physicalSocket: {
-      type: 'integer',
+      type: 'number',
       required: false,
       defaultsTo: -1
     },
     timerMode: {
       type: 'boolean',
-      required: true,
-      defaultsTo: false,
+      required: false,
+      defaultsTo: false
     },
     switchedOn: {
       type: 'boolean', // True: the socket is on. Else it's off
@@ -29,12 +29,12 @@ module.exports = {
       defaultsTo: false
     },
     startTime: { // when the socket gets switched on (in minutes after midnight)
-      type: 'integer',
+      type: 'number',
       defaultsTo: 0,
       required: false
     },
     stopTime: { // when the socket gets switched off (in minutes after midnight)
-      type: 'integer',
+      type: 'number',
       defaultsTo: 24*60,
       required: false
     },
