@@ -1,6 +1,7 @@
-module Model exposing (Model, Socket, Msg(..), RestSockets(..), initialModel, NewSocket)
+module Model exposing (Model, Msg(..), NewSocket, RestSockets(..), Socket, initialModel)
 
 import Http
+
 
 type Msg
     = SocketsReceived (Result Http.Error (List Socket))
@@ -10,22 +11,26 @@ type Msg
     | NewSocketAdd
     | NewSocketAdded (Result Http.Error Socket)
     | SocketDescriptionChanged Int String
+    | SocketStateChanged Int
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
 
 
 type alias NewSocket =
-    { description: String }
+    { description : String }
+
 
 type RestSockets
     = Error
     | Loading
     | Sockets (List Socket)
 
+
 type alias Model =
-    { sockets: RestSockets
-    , newSocket: NewSocket
+    { sockets : RestSockets
+    , newSocket : NewSocket
     }
+
 
 initialModel : Model
 initialModel =

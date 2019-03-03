@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Model exposing (..)
 
+
 view : Model -> Browser.Document Msg
 view model =
     { title = "Switches"
@@ -19,7 +20,7 @@ view model =
                 p [] [ text "Loading switches" ]
 
             Sockets sockets ->
-                ul [] (List.map viewSocket sockets)
+                ul [ class "sockets" ] (List.map viewSocket sockets)
         , section []
             [ h1 [] [ text "Add a switch" ]
             , viewAddSwitch
@@ -30,14 +31,29 @@ view model =
 
 viewSocket : Socket -> Html Msg
 viewSocket socket =
-    li []
-        [ text ("socket: " ++ (socket.id |> String.fromInt))
-        , input [ onInput (SocketDescriptionChanged socket.id), value socket.description ] []
-        , text " - "
-        , button [ onClick (ChangeSocket socket) ] [ text "Change" ]
-        , text " - "
-        , button [ onClick (DeleteSocket socket.id) ] [ text "Delete" ]
+    li [ class "socket" ]
+        [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
+        , br [] []
+        , label []
+            [ text "Description: "
+            , input [ onInput (SocketDescriptionChanged socket.id), value socket.description ] []
+            ]
+        , br [] []
+        , label []
+            [ text "On"
+            , input
+                  [ type_ "checkbox"
+                  , checked socket.switchedOn
+                  , onClick (SocketStateChanged socket.id)
+                  ] []
+            ]
+        , div [ class "buttons" ]
+            [ button [ onClick (ChangeSocket socket) ] [ text "Change" ]
+            , text " - "
+            , button [ onClick (DeleteSocket socket.id) ] [ text "Delete" ]
+            ]
         ]
+
 
 viewAddSwitch : Html Msg
 viewAddSwitch =

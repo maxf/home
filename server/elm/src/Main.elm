@@ -27,8 +27,6 @@ main =
 -- MODEL
 
 
-
-
 socketDecoder : Decoder Socket
 socketDecoder =
     succeed Socket
@@ -60,15 +58,23 @@ fetchSockets =
         , expect = Http.expectJson SocketsReceived socketsDecoder
         }
 
+
 changeSocket : Socket -> Cmd Msg
 changeSocket socket =
     Http.request
-        { method = "PUT"
+        { method = "PATCH"
         , headers = []
         , url = "/Socket/" ++ String.fromInt socket.id
         , body =
             Http.multipartBody
                 [ Http.stringPart "description" socket.description
+                , Http.stringPart "switchedOn"
+                    (if socket.switchedOn then
+                        "true"
+
+                     else
+                        "false"
+                    )
                 ]
         , expect = Http.expectWhatever SocketChanged
         , timeout = Nothing
@@ -101,15 +107,19 @@ addSocket socket =
         }
 
 
--- UPDATE
 
+-- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SocketsReceived (Ok sockets) ->
-            ( { model | sockets = Sockets sockets }, Cmd.none )
+            let
+                newSockets =
+                    List.sortBy .id sockets
+            in
+            ( { model | sockets = Sockets newSockets }, Cmd.none )
 
         SocketsReceived (Err _) ->
             ( { model | sockets = Error }, Cmd.none )
@@ -137,8 +147,10 @@ update msg model =
             case model.sockets of
                 Loading ->
                     ( model, Cmd.none )
+
                 Error ->
                     ( model, Cmd.none )
+
                 Sockets sockets ->
                     ( model, addSocket model.newSocket )
 
@@ -148,22 +160,50 @@ update msg model =
                     ( { model | sockets = Sockets (newSocket :: sockets) }
                     , Cmd.none
                     )
+
                 _ ->
                     ( model, Cmd.none )
 
         NewSocketAdded (Err _) ->
-           ( model, Cmd.none )
+            ( model, Cmd.none )
 
         SocketDescriptionChanged id desc ->
             case model.sockets of
                 Sockets sockets ->
                     let
                         updateDesc =
-                            \x -> if x.id == id then { x | description = desc  } else x
+                            \x ->
+                                if x.id == id then
+                                    { x | description = desc }
+
+                                else
+                                    x
+
                         newList =
                             List.map updateDesc sockets
                     in
-                        ( { model | sockets = Sockets newList }, Cmd.none )
+                    ( { model | sockets = Sockets newList }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        SocketStateChanged id ->
+            case model.sockets of
+                Sockets sockets ->
+                    let
+                        updateSwitch =
+                            \x ->
+                                if x.id == id then
+                                    { x | switchedOn = not x.switchedOn }
+
+                                else
+                                    x
+
+                        newList =
+                            List.map updateSwitch sockets
+                    in
+                    ( { model | sockets = Sockets newList }, Cmd.none )
+
                 _ ->
                     ( model, Cmd.none )
 
@@ -175,6 +215,7 @@ update msg model =
 
         SocketChanged (Ok _) ->
             ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
