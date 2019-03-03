@@ -5974,11 +5974,15 @@ var author$project$Main$changeSocket = function (socket) {
 			body: elm$http$Http$multipartBody(
 				_List_fromArray(
 					[
-						A2(elm$http$Http$stringPart, 'description', socket.description)
+						A2(elm$http$Http$stringPart, 'description', socket.description),
+						A2(
+						elm$http$Http$stringPart,
+						'switchedOn',
+						socket.switchedOn ? 'true' : 'false')
 					])),
 			expect: elm$http$Http$expectWhatever(author$project$Model$SocketChanged),
 			headers: _List_Nil,
-			method: 'PUT',
+			method: 'PATCH',
 			timeout: elm$core$Maybe$Nothing,
 			tracker: elm$core$Maybe$Nothing,
 			url: '/Socket/' + elm$core$String$fromInt(socket.id)
@@ -6004,6 +6008,7 @@ var author$project$Model$Sockets = function (a) {
 	return {$: 'Sockets', a: a};
 };
 var elm$core$Basics$neq = _Utils_notEqual;
+var elm$core$Basics$not = _Basics_not;
 var elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6029,6 +6034,7 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
+var elm$core$List$sortBy = _List_sortBy;
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$update = F2(
@@ -6037,11 +6043,17 @@ var author$project$Main$update = F2(
 			case 'SocketsReceived':
 				if (msg.a.$ === 'Ok') {
 					var sockets = msg.a.a;
+					var newSockets = A2(
+						elm$core$List$sortBy,
+						function ($) {
+							return $.id;
+						},
+						sockets);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								sockets: author$project$Model$Sockets(sockets)
+								sockets: author$project$Model$Sockets(newSockets)
 							}),
 						elm$core$Platform$Cmd$none);
 				} else {
@@ -6136,6 +6148,27 @@ var author$project$Main$update = F2(
 							{description: desc}) : x;
 					};
 					var newList = A2(elm$core$List$map, updateDesc, sockets);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								sockets: author$project$Model$Sockets(newList)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
+			case 'SocketStateChanged':
+				var id = msg.a;
+				var _n5 = model.sockets;
+				if (_n5.$ === 'Sockets') {
+					var sockets = _n5.a;
+					var updateSwitch = function (x) {
+						return _Utils_eq(x.id, id) ? _Utils_update(
+							x,
+							{switchedOn: !x.switchedOn}) : x;
+					};
+					var newList = A2(elm$core$List$map, updateSwitch, sockets);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -6281,7 +6314,21 @@ var author$project$Model$SocketDescriptionChanged = F2(
 	function (a, b) {
 		return {$: 'SocketDescriptionChanged', a: a, b: b};
 	});
+var author$project$Model$SocketStateChanged = function (a) {
+	return {$: 'SocketStateChanged', a: a};
+};
+var elm$html$Html$br = _VirtualDom_node('br');
+var elm$html$Html$h2 = _VirtualDom_node('h2');
 var elm$html$Html$li = _VirtualDom_node('li');
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var elm$html$Html$Attributes$checked = elm$html$Html$Attributes$boolProperty('checked');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6290,47 +6337,92 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			elm$json$Json$Encode$string(string));
 	});
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var author$project$View$viewSocket = function (socket) {
 	return A2(
 		elm$html$Html$li,
-		_List_Nil,
 		_List_fromArray(
 			[
-				elm$html$Html$text(
-				'socket: ' + elm$core$String$fromInt(socket.id)),
+				elm$html$Html$Attributes$class('socket')
+			]),
+		_List_fromArray(
+			[
 				A2(
-				elm$html$Html$input,
+				elm$html$Html$h2,
+				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$Events$onInput(
-						author$project$Model$SocketDescriptionChanged(socket.id)),
-						elm$html$Html$Attributes$value(socket.description)
-					]),
-				_List_Nil),
-				elm$html$Html$text(' - '),
-				A2(
-				elm$html$Html$button,
-				_List_fromArray(
-					[
-						elm$html$Html$Events$onClick(
-						author$project$Model$ChangeSocket(socket))
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text('Change')
+						elm$html$Html$text(
+						'Socket ' + elm$core$String$fromInt(socket.id))
 					])),
-				elm$html$Html$text(' - '),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
-				elm$html$Html$button,
+				elm$html$Html$label,
+				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$Events$onClick(
-						author$project$Model$DeleteSocket(socket.id))
+						elm$html$Html$text('Description: '),
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onInput(
+								author$project$Model$SocketDescriptionChanged(socket.id)),
+								elm$html$Html$Attributes$value(socket.description)
+							]),
+						_List_Nil)
+					])),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				elm$html$Html$label,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('On'),
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$type_('checkbox'),
+								elm$html$Html$Attributes$checked(socket.switchedOn),
+								elm$html$Html$Events$onClick(
+								author$project$Model$SocketStateChanged(socket.id))
+							]),
+						_List_Nil)
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('buttons')
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text('Delete')
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onClick(
+								author$project$Model$ChangeSocket(socket))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Change')
+							])),
+						elm$html$Html$text(' - '),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onClick(
+								author$project$Model$DeleteSocket(socket.id))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Delete')
+							]))
 					]))
 			]));
 };
@@ -6372,7 +6464,10 @@ var author$project$View$view = function (model) {
 						var sockets = _n0.a;
 						return A2(
 							elm$html$Html$ul,
-							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$class('sockets')
+								]),
 							A2(elm$core$List$map, author$project$View$viewSocket, sockets));
 				}
 			}(),
