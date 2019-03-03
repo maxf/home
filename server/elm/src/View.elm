@@ -31,7 +31,10 @@ view model =
 viewSocket : Socket -> Html Msg
 viewSocket socket =
     li []
-        [ "socket: " ++ (socket.id |> String.fromInt) ++ ", " ++ socket.description |> text
+        [ text ("socket: " ++ (socket.id |> String.fromInt))
+        , input [ onInput (SocketDescriptionChanged socket.id), value socket.description ] []
+        , text " - "
+        , button [ onClick (ChangeSocket socket) ] [ text "Change" ]
         , text " - "
         , button [ onClick (DeleteSocket socket.id) ] [ text "Delete" ]
         ]

@@ -9,6 +9,9 @@ type Msg
     | NewSocketDescriptionChanged String
     | NewSocketAdd
     | NewSocketAdded (Result Http.Error Socket)
+    | SocketDescriptionChanged Int String
+    | ChangeSocket Socket
+    | SocketChanged (Result Http.Error ())
 
 
 type alias NewSocket =

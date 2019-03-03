@@ -60,6 +60,21 @@ fetchSockets =
         , expect = Http.expectJson SocketsReceived socketsDecoder
         }
 
+changeSocket : Socket -> Cmd Msg
+changeSocket socket =
+    Http.request
+        { method = "PUT"
+        , headers = []
+        , url = "/Socket/" ++ String.fromInt socket.id
+        , body =
+            Http.multipartBody
+                [ Http.stringPart "description" socket.description
+                ]
+        , expect = Http.expectWhatever SocketChanged
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
 
 removeSocket : Int -> Cmd Msg
 removeSocket id =
@@ -138,6 +153,28 @@ update msg model =
 
         NewSocketAdded (Err _) ->
            ( model, Cmd.none )
+
+        SocketDescriptionChanged id desc ->
+            case model.sockets of
+                Sockets sockets ->
+                    let
+                        updateDesc =
+                            \x -> if x.id == id then { x | description = desc  } else x
+                        newList =
+                            List.map updateDesc sockets
+                    in
+                        ( { model | sockets = Sockets newList }, Cmd.none )
+                _ ->
+                    ( model, Cmd.none )
+
+        ChangeSocket socket ->
+            ( model, changeSocket socket )
+
+        SocketChanged (Err _) ->
+            ( { model | sockets = Error }, Cmd.none )
+
+        SocketChanged (Ok _) ->
+            ( model, Cmd.none )
 
 
 -- SUBSCRIPTIONS
