@@ -1,0 +1,20 @@
+
+ADD switch_0
+type=MIHO005
+device_id=7344
+
+
+ADD switch_1
+type=MIHO005
+device_id=10404
+
+
+ADD switch_2
+type=MIHO005
+device_id=1883
+
+
+ADD switch_3
+type=MIHO005
+device_id=9611
+
