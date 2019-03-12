@@ -6,6 +6,6 @@ windows:
       layout: main-vertical
       panes:
         - emacs -nw .
-        - export FLASK_APP=socket_server.py && flask run
-        - node_modules/.bin/sails lift
-        - cd elm && ls src/*.elm | entr -cr elm make src/Main.elm --output=../assets/js/main.js
+        - cd server && export FLASK_APP=socket_server.py && flask run
+        - cd server && node_modules/.bin/sails lift
+        - cd server/elm && ls src/*.elm | entr -cr elm make src/Main.elm --output=../assets/js/main.js
