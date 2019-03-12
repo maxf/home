@@ -6,6 +6,6 @@ windows:
       layout: main-vertical
       panes:
         - emacs -nw .
-        - sudo python socket_server.py 
-        - node_modules/.bin/sails lift
-        - cd elm && ls src/*.elm | entr -cr elm make src/Main.elm --output=../assets/js/main.js
+        - cd switch-api && sudo python socket_server.py 
+        - cd server && node_modules/.bin/sails lift
+        - cd server/elm && ls src/*.elm | entr -cr elm make src/Main.elm --output=../assets/js/main.js
