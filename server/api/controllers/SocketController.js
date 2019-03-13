@@ -16,7 +16,7 @@ const request = require('request-promise-native');
 
 module.exports = {
   add: async function (req, res) {
-    const {response, body} = await request.get('http://localhost:8000/socket/1/on');
+    const {response, body} = await request.get('http://localhost:5000/set_switch/1/on');
     if (response.statusCode !== 200) {
       return res.serverError(response.statusCode);
     } else {
@@ -24,12 +24,17 @@ module.exports = {
     }
   },
   create: async function (req, res) {
-    return defaultAdd(req, res);
+    return defaultCreate(req, res);
   },
   update: async function (req, res) {
-    return defaultAdd(req, res);
+    const {response, body} = await request.get('http://localhost:5000/set_switch/0/on');
+    if (response.statusCode !== 200) {
+      return res.serverError(response.statusCode);
+    } else {
+      return defaultUpdate(req, res);
+    }
   },
   replace: async function (req, res) {
-    return defaultAdd(req, res);
+    return defaultReplace(req, res);
   }
 };
