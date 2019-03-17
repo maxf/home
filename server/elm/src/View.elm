@@ -33,6 +33,10 @@ viewSocket : Socket -> Html Msg
 viewSocket socket =
     li [ class "socket" ]
         [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
+        , label []
+            [ text "Physical socket: "
+            , input [ onInput (SocketPhysicalIdChanged socket.id), value socket.physicalId ] []
+            ]
         , br [] []
         , label []
             [ text "Description: "

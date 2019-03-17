@@ -4971,8 +4971,8 @@ var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			decoder);
 	});
 var author$project$Model$Socket = F9(
-	function (id, description, physicalSocket, timerMode, switchedOn, startTime, stopTime, random, randomBreaks) {
-		return {description: description, id: id, physicalSocket: physicalSocket, random: random, randomBreaks: randomBreaks, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode};
+	function (id, description, physicalId, timerMode, switchedOn, startTime, stopTime, random, randomBreaks) {
+		return {description: description, id: id, physicalId: physicalId, random: random, randomBreaks: randomBreaks, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode};
 	});
 var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5005,7 +5005,7 @@ var author$project$Main$socketDecoder = A3(
 						A3(
 							NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 							'physicalSocket',
-							elm$json$Json$Decode$int,
+							elm$json$Json$Decode$string,
 							A3(
 								NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 								'description',
@@ -5978,7 +5978,8 @@ var author$project$Main$changeSocket = function (socket) {
 						A2(
 						elm$http$Http$stringPart,
 						'switchedOn',
-						socket.switchedOn ? 'true' : 'false')
+						socket.switchedOn ? 'true' : 'false'),
+						A2(elm$http$Http$stringPart, 'physicalSocket', socket.physicalId)
 					])),
 			expect: elm$http$Http$expectWhatever(author$project$Model$SocketChanged),
 			headers: _List_Nil,
@@ -6179,6 +6180,28 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
+			case 'SocketPhysicalIdChanged':
+				var id = msg.a;
+				var newPhysicalId = msg.b;
+				var _n6 = model.sockets;
+				if (_n6.$ === 'Sockets') {
+					var sockets = _n6.a;
+					var updateSwitch = function (x) {
+						return _Utils_eq(x.id, id) ? _Utils_update(
+							x,
+							{physicalId: newPhysicalId}) : x;
+					};
+					var newList = A2(elm$core$List$map, updateSwitch, sockets);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								sockets: author$project$Model$Sockets(newList)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
 			case 'ChangeSocket':
 				var socket = msg.a;
 				return _Utils_Tuple2(
@@ -6314,6 +6337,10 @@ var author$project$Model$SocketDescriptionChanged = F2(
 	function (a, b) {
 		return {$: 'SocketDescriptionChanged', a: a, b: b};
 	});
+var author$project$Model$SocketPhysicalIdChanged = F2(
+	function (a, b) {
+		return {$: 'SocketPhysicalIdChanged', a: a, b: b};
+	});
 var author$project$Model$SocketStateChanged = function (a) {
 	return {$: 'SocketStateChanged', a: a};
 };
@@ -6356,6 +6383,22 @@ var author$project$View$viewSocket = function (socket) {
 					[
 						elm$html$Html$text(
 						'Socket ' + elm$core$String$fromInt(socket.id))
+					])),
+				A2(
+				elm$html$Html$label,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Physical socket: '),
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onInput(
+								author$project$Model$SocketPhysicalIdChanged(socket.id)),
+								elm$html$Html$Attributes$value(socket.physicalId)
+							]),
+						_List_Nil)
 					])),
 				A2(elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(

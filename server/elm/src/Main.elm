@@ -32,7 +32,7 @@ socketDecoder =
     succeed Socket
         |> required "id" int
         |> required "description" string
-        |> required "physicalSocket" int
+        |> required "physicalSocket" string
         |> required "timerMode" bool
         |> required "switchedOn" bool
         |> required "startTime" int
@@ -75,6 +75,7 @@ changeSocket socket =
                      else
                         "false"
                     )
+                , Http.stringPart "physicalSocket" socket.physicalId
                 ]
         , expect = Http.expectWhatever SocketChanged
         , timeout = Nothing
@@ -206,6 +207,28 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+
+        SocketPhysicalIdChanged id newPhysicalId ->
+            case model.sockets of
+                Sockets sockets ->
+                    let
+                        updateSwitch =
+                            \x ->
+                                if x.id == id then
+                                    { x | physicalId = newPhysicalId }
+
+                                else
+                                    x
+
+                        newList =
+                            List.map updateSwitch sockets
+                    in
+                    ( { model | sockets = Sockets newList }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
         ChangeSocket socket ->
             ( model, changeSocket socket )

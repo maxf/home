@@ -11,6 +11,7 @@ type Msg
     | NewSocketAdd
     | NewSocketAdded (Result Http.Error Socket)
     | SocketDescriptionChanged Int String
+    | SocketPhysicalIdChanged Int String
     | SocketStateChanged Int
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
@@ -42,7 +43,7 @@ initialModel =
 type alias Socket =
     { id : Int
     , description : String
-    , physicalSocket : Int
+    , physicalId : String
     , timerMode : Bool
     , switchedOn : Bool
     , startTime : Int

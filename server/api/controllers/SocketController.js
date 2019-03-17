@@ -16,23 +16,23 @@ const request = require('request-promise-native');
 
 module.exports = {
   add: async function (req, res) {
-    const {response, body} = await request.get('http://localhost:5000/set_switch/1/on');
-    if (response.statusCode !== 200) {
-      return res.serverError(response.statusCode);
-    } else {
-      return defaultAdd(req, res);
+    try {
+      await request.get('http://localhost:5000/set_switch/0/on');
+    } catch (e) {
+      console.log(`error, the socket API returned an error: ${e}`);
     }
+    return defaultAdd(req, res);
   },
   create: async function (req, res) {
     return defaultCreate(req, res);
   },
   update: async function (req, res) {
-    const {response, body} = await request.get('http://localhost:5000/set_switch/0/on');
-    if (response.statusCode !== 200) {
-      return res.serverError(response.statusCode);
-    } else {
-      return defaultUpdate(req, res);
+    try {
+      await request.get('http://localhost:5000/set_switch/0/on');
+    } catch (e) {
+      console.log(`error, the socket API returned an error: ${e}`);
     }
+    return defaultUpdate(req, res);
   },
   replace: async function (req, res) {
     return defaultReplace(req, res);

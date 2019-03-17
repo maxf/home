@@ -14,9 +14,9 @@ module.exports = {
       defaultsTo: ''
     },
     physicalSocket: {
-      type: 'number',
+      type: 'string',
       required: false,
-      defaultsTo: -1
+      defaultsTo: ''
     },
     timerMode: {
       type: 'boolean',
