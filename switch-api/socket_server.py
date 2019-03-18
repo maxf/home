@@ -36,9 +36,5 @@ if __name__ == "__main__":
     # You can pass any context here, such as a class to contain your devices
     energenie.registry.load_into(me_global)
 
-    print("-----")
-    print(getattr(me_global, 'switch_0'))
-    print("-----")
-
-    app.run()
+    app.run(host= '0.0.0.0')
 

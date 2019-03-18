@@ -7,8 +7,10 @@
 # Any device that offers a power reading, it displays it.
 
 import energenie
-import Logger
 import time
+import json
+import requests
+
 
 APP_DELAY    = 2
 switch_state = False
@@ -18,23 +20,6 @@ def energy_monitor_loop():
 
     # Process any received messages from the real radio
     energenie.loop()
-
-    # For all devices in the registry, if they have a switch, toggle it
-#    for d in energenie.registry.devices():
-#        if d.has_switch():
-#            d.set_switch(switch_state)
-#    switch_state = not switch_state
-
-#    # For all devices in the registry, if they have a get_power(), call it
-#    print("Checking device status")
-#    for d in energenie.registry.devices():
-#        print("---- device ----")
-#        print(d)
-#        try:
-#            p = d.get_power()
-#            print("Power: %s" % str(p))
-#        except:
-#            print("no get_power")
 
     time.sleep(APP_DELAY)
 
@@ -48,9 +33,16 @@ if __name__ == "__main__":
     # provide a default incoming message handler, useful for logging every message
     def incoming(address, message):
         print("\nIncoming from %s" % str(address))
-        Logger.logMessage(message)
+	payload = json.dumps(message.pydict)
+        try:
+            r = requests.post('http://localhost:1337', data=payload)
+            if r.status_code != 200:
+                print("Error! Server responded with an error: "+str(r.status_code))
+
+        except requests.exceptions.ConnectionError:
+            print("Error sending data to server")
+            
     energenie.fsk_router.when_incoming(incoming)
-    print("Logging to file:%s" % Logger.LOG_FILENAME)
 
     try:
         while True:
