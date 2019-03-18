@@ -35,7 +35,6 @@ module.exports.routes = {
 
   '/switches': { view: 'pages/switches' },
 
-  '/ping': 'ReceiverController.ping'
-
+  'POST /ping': 'ReceiverController.ping'
 
 };

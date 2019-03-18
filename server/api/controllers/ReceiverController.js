@@ -8,7 +8,8 @@
 
 module.exports = {
   ping: async function (req, res) {
-    const payload = req.query.payload;
+    const message = req.body;
+    console.log(`received message from unit ${message.header.sensorid}`);
     return res.json({ 'ok': 'yay'});
   }
 };
