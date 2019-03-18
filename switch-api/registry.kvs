@@ -1,20 +1,19 @@
 
-ADD switch_0
+ADD switch_7344
 type=MIHO005
 device_id=7344
 
 
-ADD switch_1
+ADD switch_10404
 type=MIHO005
 device_id=10404
 
 
-ADD switch_2
+ADD switch_1883
 type=MIHO005
 device_id=1883
 
 
-ADD switch_3
+ADD switch_9611
 type=MIHO005
 device_id=9611
-

@@ -4,4 +4,4 @@ server/media
 .vagrant
 __pycache__
 *.pyc
-
+energenie.csv
