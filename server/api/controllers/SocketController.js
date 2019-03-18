@@ -17,7 +17,7 @@ const request = require('request-promise-native');
 
 const updateSwitch = async function(id, state) {
   const onOrOff = state === 'true' ? 'on' : 'off';
-  const apiUrl = `http://localhost:5000/set_switch/${id}/${onOrOff}`;
+  const apiUrl = `http://192.168.0.3:5000/set_switch/${id}/${onOrOff}`;
   console.log(`sending "${onOrOff}" to switch ${id}`);
   try {
     await request.get(apiUrl);
