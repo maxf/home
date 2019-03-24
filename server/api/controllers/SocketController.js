@@ -42,5 +42,8 @@ module.exports = {
   },
   destroy: async function (req, res) {
     return defaultDestroy(req, res);
-  }
+  },
+  setSwitch: async function (req, res) {
+    return res.json({'meh': 'boo'});
+  },
 };

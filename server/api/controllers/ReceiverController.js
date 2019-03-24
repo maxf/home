@@ -8,7 +8,8 @@
 
 module.exports = {
   ping: async function (req, res) {
-    const payload = req.query.payload;
+    const payload = req.body;
+    console.log('received ping', req.body);
     return res.json({ 'ok': 'yay'});
   }
 };
