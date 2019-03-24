@@ -47,6 +47,10 @@ module.exports = {
       type: 'boolean',
       required: false,
       defaultsTo: true
+    },
+    lastMessageReceived: {
+      type: 'number',
+      required: false
     }
   }
 };

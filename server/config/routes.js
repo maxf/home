@@ -35,10 +35,8 @@ module.exports.routes = {
 
   '/switches': { view: 'pages/switches' },
 
-  '/set_switch': 'SocketController.setSwitch',
+  'POST /set_switch': 'SocketController.setSwitch',
 
-
-  '/ping': 'ReceiverController.ping'
-
+  'POST /ping': 'ReceiverController.ping'
 
 };

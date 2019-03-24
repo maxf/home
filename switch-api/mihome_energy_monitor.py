@@ -32,16 +32,18 @@ if __name__ == "__main__":
 
     # provide a default incoming message handler, useful for logging every message
     def incoming(address, message):
-        print("\nIncoming from %s" % str(address))
+#        print("\nIncoming from %s" % str(address))
 	payload = json.dumps(message.pydict)
         try:
-            r = requests.post('http://localhost:1337', data=payload)
+            print("pinging")
+            print(payload)
+            r = requests.post('http://192.168.0.5:1337/ping', data=payload)
             if r.status_code != 200:
                 print("Error! Server responded with an error: "+str(r.status_code))
 
         except requests.exceptions.ConnectionError:
             print("Error sending data to server")
-            
+
     energenie.fsk_router.when_incoming(incoming)
 
     try:
@@ -51,4 +53,3 @@ if __name__ == "__main__":
         energenie.finished()
 
 # END
-
