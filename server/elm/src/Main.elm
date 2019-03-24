@@ -3,7 +3,7 @@ module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder, soc
 import Browser
 import Browser.Navigation as Nav
 import Http
-import Json.Decode exposing (Decoder, bool, int, list, string, succeed)
+import Json.Decode exposing (Decoder, bool, int, list, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Model exposing (..)
 import View exposing (view)
@@ -39,6 +39,7 @@ socketDecoder =
         |> required "stopTime" int
         |> required "random" bool
         |> required "randomBreaks" bool
+        |> required "lastMessageReceived" (nullable int)
 
 
 socketsDecoder : Decoder (List Socket)

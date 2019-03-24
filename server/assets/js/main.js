@@ -4970,51 +4970,83 @@ var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2(elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
-var author$project$Model$Socket = F9(
-	function (id, description, physicalId, timerMode, switchedOn, startTime, stopTime, random, randomBreaks) {
-		return {description: description, id: id, physicalId: physicalId, random: random, randomBreaks: randomBreaks, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode};
-	});
+var author$project$Model$Socket = function (id) {
+	return function (description) {
+		return function (physicalId) {
+			return function (timerMode) {
+				return function (switchedOn) {
+					return function (startTime) {
+						return function (stopTime) {
+							return function (random) {
+								return function (randomBreaks) {
+									return function (lastMessageReceived) {
+										return {description: description, id: id, lastMessageReceived: lastMessageReceived, physicalId: physicalId, random: random, randomBreaks: randomBreaks, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$int = _Json_decodeInt;
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$null = _Json_decodeNull;
+var elm$json$Json$Decode$oneOf = _Json_oneOf;
+var elm$json$Json$Decode$nullable = function (decoder) {
+	return elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				elm$json$Json$Decode$null(elm$core$Maybe$Nothing),
+				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder)
+			]));
+};
 var elm$json$Json$Decode$string = _Json_decodeString;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var author$project$Main$socketDecoder = A3(
 	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'randomBreaks',
-	elm$json$Json$Decode$bool,
+	'lastMessageReceived',
+	elm$json$Json$Decode$nullable(elm$json$Json$Decode$int),
 	A3(
 		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'random',
+		'randomBreaks',
 		elm$json$Json$Decode$bool,
 		A3(
 			NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'stopTime',
-			elm$json$Json$Decode$int,
+			'random',
+			elm$json$Json$Decode$bool,
 			A3(
 				NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-				'startTime',
+				'stopTime',
 				elm$json$Json$Decode$int,
 				A3(
 					NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-					'switchedOn',
-					elm$json$Json$Decode$bool,
+					'startTime',
+					elm$json$Json$Decode$int,
 					A3(
 						NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-						'timerMode',
+						'switchedOn',
 						elm$json$Json$Decode$bool,
 						A3(
 							NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-							'physicalSocket',
-							elm$json$Json$Decode$string,
+							'timerMode',
+							elm$json$Json$Decode$bool,
 							A3(
 								NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-								'description',
+								'physicalSocket',
 								elm$json$Json$Decode$string,
 								A3(
 									NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-									'id',
-									elm$json$Json$Decode$int,
-									elm$json$Json$Decode$succeed(author$project$Model$Socket))))))))));
+									'description',
+									elm$json$Json$Decode$string,
+									A3(
+										NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+										'id',
+										elm$json$Json$Decode$int,
+										elm$json$Json$Decode$succeed(author$project$Model$Socket)))))))))));
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Main$socketsDecoder = elm$json$Json$Decode$list(author$project$Main$socketDecoder);
 var author$project$Model$SocketsReceived = function (a) {
@@ -6256,7 +6288,6 @@ var author$project$Model$NewSocketAdd = {$: 'NewSocketAdd'};
 var author$project$Model$NewSocketDescriptionChanged = function (a) {
 	return {$: 'NewSocketDescriptionChanged', a: a};
 };
-var elm$json$Json$Decode$map = _Json_map1;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
 		case 'Normal':
@@ -6380,10 +6411,202 @@ var author$project$Model$SwitchOff = function (a) {
 var author$project$Model$SwitchOn = function (a) {
 	return {$: 'SwitchOn', a: a};
 };
+var author$project$View$toEnglishMonth = function (month) {
+	switch (month.$) {
+		case 'Jan':
+			return 'Jan';
+		case 'Feb':
+			return 'Feb';
+		case 'Mar':
+			return 'Mar';
+		case 'Apr':
+			return 'Apr';
+		case 'May':
+			return 'Mai';
+		case 'Jun':
+			return 'Jun';
+		case 'Jul':
+			return 'Jul';
+		case 'Aug':
+			return 'Aug';
+		case 'Sep':
+			return 'Sep';
+		case 'Oct':
+			return 'Oct';
+		case 'Nov':
+			return 'Nov';
+		default:
+			return 'Dec';
+	}
+};
+var elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var elm$time$Time$millisToPosix = elm$time$Time$Posix;
+var elm$time$Time$flooredDiv = F2(
+	function (numerator, denominator) {
+		return elm$core$Basics$floor(numerator / denominator);
+	});
+var elm$time$Time$posixToMillis = function (_n0) {
+	var millis = _n0.a;
+	return millis;
+};
+var elm$time$Time$toAdjustedMinutesHelp = F3(
+	function (defaultOffset, posixMinutes, eras) {
+		toAdjustedMinutesHelp:
+		while (true) {
+			if (!eras.b) {
+				return posixMinutes + defaultOffset;
+			} else {
+				var era = eras.a;
+				var olderEras = eras.b;
+				if (_Utils_cmp(era.start, posixMinutes) < 0) {
+					return posixMinutes + era.offset;
+				} else {
+					var $temp$defaultOffset = defaultOffset,
+						$temp$posixMinutes = posixMinutes,
+						$temp$eras = olderEras;
+					defaultOffset = $temp$defaultOffset;
+					posixMinutes = $temp$posixMinutes;
+					eras = $temp$eras;
+					continue toAdjustedMinutesHelp;
+				}
+			}
+		}
+	});
+var elm$time$Time$toAdjustedMinutes = F2(
+	function (_n0, time) {
+		var defaultOffset = _n0.a;
+		var eras = _n0.b;
+		return A3(
+			elm$time$Time$toAdjustedMinutesHelp,
+			defaultOffset,
+			A2(
+				elm$time$Time$flooredDiv,
+				elm$time$Time$posixToMillis(time),
+				60000),
+			eras);
+	});
+var elm$core$Basics$ge = _Utils_ge;
+var elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var elm$time$Time$toCivil = function (minutes) {
+	var rawDay = A2(elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
+	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
+	var dayOfEra = rawDay - (era * 146097);
+	var yearOfEra = ((((dayOfEra - ((dayOfEra / 1460) | 0)) + ((dayOfEra / 36524) | 0)) - ((dayOfEra / 146096) | 0)) / 365) | 0;
+	var dayOfYear = dayOfEra - (((365 * yearOfEra) + ((yearOfEra / 4) | 0)) - ((yearOfEra / 100) | 0));
+	var mp = (((5 * dayOfYear) + 2) / 153) | 0;
+	var month = mp + ((mp < 10) ? 3 : (-9));
+	var year = yearOfEra + (era * 400);
+	return {
+		day: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		month: month,
+		year: year + ((month <= 2) ? 1 : 0)
+	};
+};
+var elm$time$Time$toDay = F2(
+	function (zone, time) {
+		return elm$time$Time$toCivil(
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).day;
+	});
+var elm$core$Basics$modBy = _Basics_modBy;
+var elm$time$Time$toHour = F2(
+	function (zone, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			24,
+			A2(
+				elm$time$Time$flooredDiv,
+				A2(elm$time$Time$toAdjustedMinutes, zone, time),
+				60));
+	});
+var elm$time$Time$toMinute = F2(
+	function (zone, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			60,
+			A2(elm$time$Time$toAdjustedMinutes, zone, time));
+	});
+var elm$time$Time$Apr = {$: 'Apr'};
+var elm$time$Time$Aug = {$: 'Aug'};
+var elm$time$Time$Dec = {$: 'Dec'};
+var elm$time$Time$Feb = {$: 'Feb'};
+var elm$time$Time$Jan = {$: 'Jan'};
+var elm$time$Time$Jul = {$: 'Jul'};
+var elm$time$Time$Jun = {$: 'Jun'};
+var elm$time$Time$Mar = {$: 'Mar'};
+var elm$time$Time$May = {$: 'May'};
+var elm$time$Time$Nov = {$: 'Nov'};
+var elm$time$Time$Oct = {$: 'Oct'};
+var elm$time$Time$Sep = {$: 'Sep'};
+var elm$time$Time$toMonth = F2(
+	function (zone, time) {
+		var _n0 = elm$time$Time$toCivil(
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).month;
+		switch (_n0) {
+			case 1:
+				return elm$time$Time$Jan;
+			case 2:
+				return elm$time$Time$Feb;
+			case 3:
+				return elm$time$Time$Mar;
+			case 4:
+				return elm$time$Time$Apr;
+			case 5:
+				return elm$time$Time$May;
+			case 6:
+				return elm$time$Time$Jun;
+			case 7:
+				return elm$time$Time$Jul;
+			case 8:
+				return elm$time$Time$Aug;
+			case 9:
+				return elm$time$Time$Sep;
+			case 10:
+				return elm$time$Time$Oct;
+			case 11:
+				return elm$time$Time$Nov;
+			default:
+				return elm$time$Time$Dec;
+		}
+	});
+var elm$time$Time$toSecond = F2(
+	function (_n0, time) {
+		return A2(
+			elm$core$Basics$modBy,
+			60,
+			A2(
+				elm$time$Time$flooredDiv,
+				elm$time$Time$posixToMillis(time),
+				1000));
+	});
+var elm$time$Time$toYear = F2(
+	function (zone, time) {
+		return elm$time$Time$toCivil(
+			A2(elm$time$Time$toAdjustedMinutes, zone, time)).year;
+	});
+var elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var elm$time$Time$utc = A2(elm$time$Time$Zone, 0, _List_Nil);
+var author$project$View$toUtcString = function (time) {
+	var posix = elm$time$Time$millisToPosix(time);
+	return elm$core$String$fromInt(
+		A2(elm$time$Time$toDay, elm$time$Time$utc, posix)) + (' ' + (author$project$View$toEnglishMonth(
+		A2(elm$time$Time$toMonth, elm$time$Time$utc, posix)) + (' ' + (elm$core$String$fromInt(
+		A2(elm$time$Time$toYear, elm$time$Time$utc, posix)) + (' at ' + (elm$core$String$fromInt(
+		A2(elm$time$Time$toHour, elm$time$Time$utc, posix)) + (':' + (elm$core$String$fromInt(
+		A2(elm$time$Time$toMinute, elm$time$Time$utc, posix)) + (':' + (elm$core$String$fromInt(
+		A2(elm$time$Time$toSecond, elm$time$Time$utc, posix)) + ' (UTC)'))))))))));
+};
 var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$h2 = _VirtualDom_node('h2');
 var elm$html$Html$h3 = _VirtualDom_node('h3');
 var elm$html$Html$li = _VirtualDom_node('li');
+var elm$html$Html$p = _VirtualDom_node('p');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6395,6 +6618,15 @@ var elm$html$Html$Attributes$stringProperty = F2(
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var author$project$View$viewSocket = function (socket) {
+	var lastSeen = function () {
+		var _n0 = socket.lastMessageReceived;
+		if (_n0.$ === 'Nothing') {
+			return 'never';
+		} else {
+			var secs = _n0.a;
+			return author$project$View$toUtcString(secs);
+		}
+	}();
 	return A2(
 		elm$html$Html$li,
 		_List_fromArray(
@@ -6418,6 +6650,13 @@ var author$project$View$viewSocket = function (socket) {
 					[
 						elm$html$Html$text(
 						' is currently ' + (socket.switchedOn ? 'ON' : 'OFF'))
+					])),
+				A2(
+				elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Last seen: ' + lastSeen)
 					])),
 				A2(
 				elm$html$Html$label,
@@ -6511,7 +6750,6 @@ var author$project$View$viewSocket = function (socket) {
 			]));
 };
 var elm$html$Html$h1 = _VirtualDom_node('h1');
-var elm$html$Html$p = _VirtualDom_node('p');
 var elm$html$Html$section = _VirtualDom_node('section');
 var elm$html$Html$ul = _VirtualDom_node('ul');
 var author$project$View$view = function (model) {

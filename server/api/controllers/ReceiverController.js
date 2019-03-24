@@ -11,15 +11,24 @@ module.exports = {
     const message = req.body;
     const sensorId = message.header.sensorid;
     const state = message.recs
-      .filter(rec => rec.paramname === 'SWITCH_STATE')
+      .filter(rec => rec.paramname === 'SWITCH_STATE');
 
     if (state.length === 1) {
       const onOrOff = state[0].value === 0 ? 'off' : 'on';
       console.log(`switch ${sensorId} is ${onOrOff}`);
 
-      // Now update model and update lastMessageFrom
-      const socket = await Socket.find({physicalSocket: sensorId});
+      // Now update model and update lastMessageReceived
+      const updatedSocket = await Socket.updateOne({physicalSocket: sensorId})
+        .set({
+          switchedOn: state[0].value === 0,
+          lastMessageReceived: new Date()
+        });
 
+      if (!updatedSocket) {
+        sails.log('failed to find and update socket ' + sensorId);
+      } else {
+        sails.log('updated socket' + sensorId);
+      }
 
     } else {
       console.log(`switch ${sensorId} has no single SWITCH_STATE`);

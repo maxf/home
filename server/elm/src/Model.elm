@@ -52,4 +52,5 @@ type alias Socket =
     , stopTime : Int
     , random : Bool
     , randomBreaks : Bool
+    , lastMessageReceived: Maybe Int
     }

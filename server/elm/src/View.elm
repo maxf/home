@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Model exposing (..)
+import Time exposing (Month(..), utc, toHour, toMinute, toSecond, millisToPosix, toDay, toMonth, toYear)
 
 
 view : Model -> Browser.Document Msg
@@ -31,9 +32,16 @@ view model =
 
 viewSocket : Socket -> Html Msg
 viewSocket socket =
+    let
+        lastSeen =
+            case socket.lastMessageReceived of
+                Nothing -> "never"
+                Just secs -> secs |> toUtcString
+    in
     li [ class "socket" ]
         [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
         , h3 [] [ text (" is currently " ++ (if socket.switchedOn then "ON" else "OFF")) ]
+        , p [] [ text ("Last seen: " ++ lastSeen) ]
         , label []
             [ text "Physical socket: "
             , input [ onInput (SocketPhysicalIdChanged socket.id), value socket.physicalId ] []
@@ -64,3 +72,41 @@ viewAddSwitch =
             ]
         , button [ onClick NewSocketAdd ] [ text "Add" ]
         ]
+
+
+
+toUtcString : Int -> String
+toUtcString time =
+    let
+        posix =
+            millisToPosix time
+    in
+        String.fromInt (toDay utc posix)
+        ++ " " ++
+        toEnglishMonth (toMonth utc posix)
+        ++ " " ++
+        String.fromInt (toYear utc posix)
+        ++ " at " ++
+        String.fromInt (toHour utc posix)
+        ++ ":" ++
+        String.fromInt (toMinute utc posix)
+        ++ ":" ++
+        String.fromInt (toSecond utc posix)
+        ++ " (UTC)"
+
+
+toEnglishMonth : Month -> String
+toEnglishMonth month =
+  case month of
+    Jan -> "Jan"
+    Feb -> "Feb"
+    Mar -> "Mar"
+    Apr -> "Apr"
+    May -> "Mai"
+    Jun -> "Jun"
+    Jul -> "Jul"
+    Aug -> "Aug"
+    Sep -> "Sep"
+    Oct -> "Oct"
+    Nov -> "Nov"
+    Dec -> "Dec"

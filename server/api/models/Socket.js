@@ -50,7 +50,8 @@ module.exports = {
     },
     lastMessageReceived: {
       type: 'number',
-      required: false
+      required: false,
+      allowNull: true
     }
   }
 };
