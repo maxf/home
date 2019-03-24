@@ -33,6 +33,7 @@ viewSocket : Socket -> Html Msg
 viewSocket socket =
     li [ class "socket" ]
         [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
+        , h3 [] [ text (" is currently " ++ (if socket.switchedOn then "ON" else "OFF")) ]
         , label []
             [ text "Physical socket: "
             , input [ onInput (SocketPhysicalIdChanged socket.id), value socket.physicalId ] []
@@ -43,14 +44,9 @@ viewSocket socket =
             , input [ onInput (SocketDescriptionChanged socket.id), value socket.description ] []
             ]
         , br [] []
-        , label []
-            [ text "On"
-            , input
-                  [ type_ "checkbox"
-                  , checked socket.switchedOn
-                  , onClick (SocketStateChanged socket.id)
-                  ] []
-            ]
+        , button [ onClick (SwitchOn socket) ] [ text "Switch on" ]
+        , button [ onClick (SwitchOff socket) ] [ text "Switch off" ]
+        , br [] []
         , div [ class "buttons" ]
             [ button [ onClick (ChangeSocket socket) ] [ text "Change" ]
             , text " - "

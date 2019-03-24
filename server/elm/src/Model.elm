@@ -12,7 +12,9 @@ type Msg
     | NewSocketAdded (Result Http.Error Socket)
     | SocketDescriptionChanged Int String
     | SocketPhysicalIdChanged Int String
-    | SocketStateChanged Int
+    | SwitchOn Socket
+    | SwitchOff Socket
+    | SocketSwitched (Result Http.Error Socket)
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
 

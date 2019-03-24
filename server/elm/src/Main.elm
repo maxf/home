@@ -83,6 +83,23 @@ changeSocket socket =
         }
 
 
+switchSocket : Bool -> Socket -> Cmd Msg
+switchSocket state socket =
+    let
+        newState =
+            if state then
+                "on"
+
+            else
+                "off"
+    in
+    Http.post
+        { url = "/change_state/" ++ socket.physicalId ++ "/" ++ newState
+        , body = Http.emptyBody
+        , expect = Http.expectJson SocketSwitched socketDecoder
+        }
+
+
 removeSocket : Int -> Cmd Msg
 removeSocket id =
     Http.request
@@ -188,27 +205,6 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        SocketStateChanged id ->
-            case model.sockets of
-                Sockets sockets ->
-                    let
-                        updateSwitch =
-                            \x ->
-                                if x.id == id then
-                                    { x | switchedOn = not x.switchedOn }
-
-                                else
-                                    x
-
-                        newList =
-                            List.map updateSwitch sockets
-                    in
-                    ( { model | sockets = Sockets newList }, Cmd.none )
-
-                _ ->
-                    ( model, Cmd.none )
-
-
         SocketPhysicalIdChanged id newPhysicalId ->
             case model.sockets of
                 Sockets sockets ->
@@ -229,6 +225,37 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        SwitchOn socket ->
+            ( model, switchSocket True socket )
+
+        SwitchOff socket ->
+            ( model, switchSocket False socket )
+
+        SocketSwitched (Err _) ->
+            ( { model | sockets = Error }, Cmd.none )
+
+        SocketSwitched (Ok socket) ->
+            case model.sockets of
+                Loading ->
+                    ( model, Cmd.none )
+
+                Error ->
+                    ( model, Cmd.none )
+
+                Sockets sockets ->
+                    let
+                        updateSwitch =
+                            \x ->
+                                if x.id == socket.id then
+                                    { x | switchedOn = socket.switchedOn }
+
+                                else
+                                    x
+
+                        newList =
+                            List.map updateSwitch sockets
+                    in
+                    ( { model | sockets = Sockets newList }, Cmd.none )
 
         ChangeSocket socket ->
             ( model, changeSocket socket )

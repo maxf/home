@@ -6004,12 +6004,24 @@ var author$project$Main$removeSocket = function (id) {
 			url: '/Socket/' + elm$core$String$fromInt(id)
 		});
 };
+var author$project$Model$SocketSwitched = function (a) {
+	return {$: 'SocketSwitched', a: a};
+};
+var author$project$Main$switchSocket = F2(
+	function (state, socket) {
+		var newState = state ? 'on' : 'off';
+		return elm$http$Http$post(
+			{
+				body: elm$http$Http$emptyBody,
+				expect: A2(elm$http$Http$expectJson, author$project$Model$SocketSwitched, author$project$Main$socketDecoder),
+				url: '/change_state/' + (socket.physicalId + ('/' + newState))
+			});
+	});
 var author$project$Model$Error = {$: 'Error'};
 var author$project$Model$Sockets = function (a) {
 	return {$: 'Sockets', a: a};
 };
 var elm$core$Basics$neq = _Utils_notEqual;
-var elm$core$Basics$not = _Basics_not;
 var elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6159,33 +6171,12 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
-			case 'SocketStateChanged':
-				var id = msg.a;
-				var _n5 = model.sockets;
-				if (_n5.$ === 'Sockets') {
-					var sockets = _n5.a;
-					var updateSwitch = function (x) {
-						return _Utils_eq(x.id, id) ? _Utils_update(
-							x,
-							{switchedOn: !x.switchedOn}) : x;
-					};
-					var newList = A2(elm$core$List$map, updateSwitch, sockets);
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								sockets: author$project$Model$Sockets(newList)
-							}),
-						elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-				}
 			case 'SocketPhysicalIdChanged':
 				var id = msg.a;
 				var newPhysicalId = msg.b;
-				var _n6 = model.sockets;
-				if (_n6.$ === 'Sockets') {
-					var sockets = _n6.a;
+				var _n5 = model.sockets;
+				if (_n5.$ === 'Sockets') {
+					var sockets = _n5.a;
 					var updateSwitch = function (x) {
 						return _Utils_eq(x.id, id) ? _Utils_update(
 							x,
@@ -6201,6 +6192,48 @@ var author$project$Main$update = F2(
 						elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
+			case 'SwitchOn':
+				var socket = msg.a;
+				return _Utils_Tuple2(
+					model,
+					A2(author$project$Main$switchSocket, true, socket));
+			case 'SwitchOff':
+				var socket = msg.a;
+				return _Utils_Tuple2(
+					model,
+					A2(author$project$Main$switchSocket, false, socket));
+			case 'SocketSwitched':
+				if (msg.a.$ === 'Err') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{sockets: author$project$Model$Error}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					var socket = msg.a.a;
+					var _n6 = model.sockets;
+					switch (_n6.$) {
+						case 'Loading':
+							return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+						case 'Error':
+							return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+						default:
+							var sockets = _n6.a;
+							var updateSwitch = function (x) {
+								return _Utils_eq(x.id, socket.id) ? _Utils_update(
+									x,
+									{switchedOn: socket.switchedOn}) : x;
+							};
+							var newList = A2(elm$core$List$map, updateSwitch, sockets);
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										sockets: author$project$Model$Sockets(newList)
+									}),
+								elm$core$Platform$Cmd$none);
+					}
 				}
 			case 'ChangeSocket':
 				var socket = msg.a;
@@ -6341,21 +6374,16 @@ var author$project$Model$SocketPhysicalIdChanged = F2(
 	function (a, b) {
 		return {$: 'SocketPhysicalIdChanged', a: a, b: b};
 	});
-var author$project$Model$SocketStateChanged = function (a) {
-	return {$: 'SocketStateChanged', a: a};
+var author$project$Model$SwitchOff = function (a) {
+	return {$: 'SwitchOff', a: a};
+};
+var author$project$Model$SwitchOn = function (a) {
+	return {$: 'SwitchOn', a: a};
 };
 var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$h2 = _VirtualDom_node('h2');
+var elm$html$Html$h3 = _VirtualDom_node('h3');
 var elm$html$Html$li = _VirtualDom_node('li');
-var elm$json$Json$Encode$bool = _Json_wrap;
-var elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$bool(bool));
-	});
-var elm$html$Html$Attributes$checked = elm$html$Html$Attributes$boolProperty('checked');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6365,7 +6393,6 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
-var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var author$project$View$viewSocket = function (socket) {
 	return A2(
@@ -6383,6 +6410,14 @@ var author$project$View$viewSocket = function (socket) {
 					[
 						elm$html$Html$text(
 						'Socket ' + elm$core$String$fromInt(socket.id))
+					])),
+				A2(
+				elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						' is currently ' + (socket.switchedOn ? 'ON' : 'OFF'))
 					])),
 				A2(
 				elm$html$Html$label,
@@ -6419,22 +6454,28 @@ var author$project$View$viewSocket = function (socket) {
 					])),
 				A2(elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
-				elm$html$Html$label,
-				_List_Nil,
+				elm$html$Html$button,
 				_List_fromArray(
 					[
-						elm$html$Html$text('On'),
-						A2(
-						elm$html$Html$input,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$type_('checkbox'),
-								elm$html$Html$Attributes$checked(socket.switchedOn),
-								elm$html$Html$Events$onClick(
-								author$project$Model$SocketStateChanged(socket.id))
-							]),
-						_List_Nil)
+						elm$html$Html$Events$onClick(
+						author$project$Model$SwitchOn(socket))
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Switch on')
 					])),
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(
+						author$project$Model$SwitchOff(socket))
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Switch off')
+					])),
+				A2(elm$html$Html$br, _List_Nil, _List_Nil),
 				A2(
 				elm$html$Html$div,
 				_List_fromArray(
