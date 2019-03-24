@@ -35,7 +35,9 @@ if __name__ == "__main__":
 #        print("\nIncoming from %s" % str(address))
 	payload = json.dumps(message.pydict)
         try:
-            r = requests.post('http://localhost:1337/ping', data=payload)
+            print("pinging")
+            print(payload)
+            r = requests.post('http://192.168.0.5:1337/ping', data=payload)
             if r.status_code != 200:
                 print("Error! Server responded with an error: "+str(r.status_code))
 
