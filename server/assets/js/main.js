@@ -4970,6 +4970,20 @@ var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2(elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
+var elm$core$String$toInt = _String_toInt;
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$Main$timestampAsStringDecoder = function () {
+	var zeroNothing = function (s) {
+		if (s === '0') {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var other = s;
+			return elm$core$String$toInt(s);
+		}
+	};
+	return A2(elm$json$Json$Decode$map, zeroNothing, elm$json$Json$Decode$string);
+}();
 var author$project$Model$Socket = function (id) {
 	return function (description) {
 		return function (physicalId) {
@@ -4993,23 +5007,11 @@ var author$project$Model$Socket = function (id) {
 };
 var elm$json$Json$Decode$bool = _Json_decodeBool;
 var elm$json$Json$Decode$int = _Json_decodeInt;
-var elm$json$Json$Decode$map = _Json_map1;
-var elm$json$Json$Decode$null = _Json_decodeNull;
-var elm$json$Json$Decode$oneOf = _Json_oneOf;
-var elm$json$Json$Decode$nullable = function (decoder) {
-	return elm$json$Json$Decode$oneOf(
-		_List_fromArray(
-			[
-				elm$json$Json$Decode$null(elm$core$Maybe$Nothing),
-				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder)
-			]));
-};
-var elm$json$Json$Decode$string = _Json_decodeString;
 var elm$json$Json$Decode$succeed = _Json_succeed;
 var author$project$Main$socketDecoder = A3(
 	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 	'lastMessageReceived',
-	elm$json$Json$Decode$nullable(elm$json$Json$Decode$int),
+	author$project$Main$timestampAsStringDecoder,
 	A3(
 		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 		'randomBreaks',
@@ -6439,6 +6441,7 @@ var author$project$View$toEnglishMonth = function (month) {
 			return 'Dec';
 	}
 };
+var elm$core$Debug$log = _Debug_log;
 var elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
 };
@@ -6593,7 +6596,10 @@ var elm$time$Time$Zone = F2(
 	});
 var elm$time$Time$utc = A2(elm$time$Time$Zone, 0, _List_Nil);
 var author$project$View$toUtcString = function (time) {
-	var posix = elm$time$Time$millisToPosix(time);
+	var posix = A2(
+		elm$core$Debug$log,
+		'>',
+		elm$time$Time$millisToPosix(time));
 	return elm$core$String$fromInt(
 		A2(elm$time$Time$toDay, elm$time$Time$utc, posix)) + (' ' + (author$project$View$toEnglishMonth(
 		A2(elm$time$Time$toMonth, elm$time$Time$utc, posix)) + (' ' + (elm$core$String$fromInt(
@@ -6905,7 +6911,6 @@ var elm$core$String$left = F2(
 		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
 	});
 var elm$core$String$contains = _String_contains;
-var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
 		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
