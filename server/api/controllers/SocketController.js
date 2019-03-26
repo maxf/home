@@ -15,10 +15,9 @@ const defaultDestroy = require(defaultActionsPath+'destroy.js'); // DELETE
 const request = require('request-promise-native');
 
 
-const updateSwitch = async function(id, state) {
-  const onOrOff = state === 'true' ? 'on' : 'off';
+const updateSwitch = async function(id, onOrOff) {
   const apiUrl = `http://192.168.0.3:5000/set_switch/${id}/${onOrOff}`;
-  console.log(`sending "${onOrOff}" to switch ${id}`);
+  sails.log(`sending "${onOrOff}" to switch ${id}`);
   try {
     await request.get(apiUrl);
   } catch (e) {
@@ -34,7 +33,6 @@ module.exports = {
     return defaultCreate(req, res);
   },
   update: async function (req, res) {
-    updateSwitch(req.body.physicalSocket, req.body.switchedOn);
     return defaultUpdate(req, res);
   },
   replace: async function (req, res) {
@@ -44,6 +42,14 @@ module.exports = {
     return defaultDestroy(req, res);
   },
   setSwitch: async function (req, res) {
-    return res.json({'meh': 'boo'});
-  },
+    const socket = await Socket.findOne({physicalSocket: req.param('device_id')});
+    if (socket) {
+      updateSwitch(socket.physicalSocket, req.param('state'));
+      return res.send('ok');
+
+    } else {
+      sails.log('Error, didn\'t find switch with id: ' + req.param('device_id'));
+      return res.send('err');
+    }
+  }
 };

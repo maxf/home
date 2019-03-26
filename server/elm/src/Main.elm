@@ -112,7 +112,7 @@ switchSocket state socket =
     Http.post
         { url = "/set_switch/" ++ socket.physicalId ++ "/" ++ newState
         , body = Http.emptyBody
-        , expect = Http.expectJson SocketSwitched socketDecoder
+        , expect = Http.expectWhatever SocketSwitched
         }
 
 
@@ -251,27 +251,7 @@ update msg model =
             ( { model | sockets = Error }, Cmd.none )
 
         SocketSwitched (Ok socket) ->
-            case model.sockets of
-                Loading ->
-                    ( model, Cmd.none )
-
-                Error ->
-                    ( model, Cmd.none )
-
-                Sockets sockets ->
-                    let
-                        updateSwitch =
-                            \x ->
-                                if x.id == socket.id then
-                                    { x | switchedOn = socket.switchedOn }
-
-                                else
-                                    x
-
-                        newList =
-                            List.map updateSwitch sockets
-                    in
-                    ( { model | sockets = Sockets newList }, Cmd.none )
+            ( model, Cmd.none )
 
         ChangeSocket socket ->
             ( model, changeSocket socket )

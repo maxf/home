@@ -14,7 +14,7 @@ type Msg
     | SocketPhysicalIdChanged Int String
     | SwitchOn Socket
     | SwitchOff Socket
-    | SocketSwitched (Result Http.Error Socket)
+    | SocketSwitched (Result Http.Error ())
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
 
