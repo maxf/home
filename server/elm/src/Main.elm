@@ -3,7 +3,7 @@ module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder, soc
 import Browser
 import Browser.Navigation as Nav
 import Http
-import Json.Decode exposing (Decoder, bool, int, list, nullable, string, succeed, map)
+import Json.Decode exposing (Decoder, bool, int, list, map, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Model exposing (..)
 import View exposing (view)
@@ -26,6 +26,7 @@ main =
 
 -- MODEL
 
+
 timestampAsStringDecoder : Decoder (Maybe Int)
 timestampAsStringDecoder =
     let
@@ -34,10 +35,12 @@ timestampAsStringDecoder =
             case s of
                 "0" ->
                     Nothing
+
                 other ->
                     String.toInt s
     in
     map zeroNothing string
+
 
 socketDecoder : Decoder Socket
 socketDecoder =
@@ -107,7 +110,7 @@ switchSocket state socket =
                 "off"
     in
     Http.post
-        { url = "/change_state/" ++ socket.physicalId ++ "/" ++ newState
+        { url = "/set_switch/" ++ socket.physicalId ++ "/" ++ newState
         , body = Http.emptyBody
         , expect = Http.expectJson SocketSwitched socketDecoder
         }
