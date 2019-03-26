@@ -3,7 +3,7 @@ module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder, soc
 import Browser
 import Browser.Navigation as Nav
 import Http
-import Json.Decode exposing (Decoder, bool, int, list, nullable, string, succeed)
+import Json.Decode exposing (Decoder, bool, int, list, nullable, string, succeed, map)
 import Json.Decode.Pipeline exposing (required)
 import Model exposing (..)
 import View exposing (view)
@@ -26,6 +26,18 @@ main =
 
 -- MODEL
 
+timestampAsStringDecoder : Decoder (Maybe Int)
+timestampAsStringDecoder =
+    let
+        zeroNothing : String -> Maybe Int
+        zeroNothing s =
+            case s of
+                "0" ->
+                    Nothing
+                other ->
+                    String.toInt s
+    in
+    map zeroNothing string
 
 socketDecoder : Decoder Socket
 socketDecoder =
@@ -39,7 +51,7 @@ socketDecoder =
         |> required "stopTime" int
         |> required "random" bool
         |> required "randomBreaks" bool
-        |> required "lastMessageReceived" (nullable int)
+        |> required "lastMessageReceived" timestampAsStringDecoder
 
 
 socketsDecoder : Decoder (List Socket)

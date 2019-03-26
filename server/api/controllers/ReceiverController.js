@@ -21,7 +21,7 @@ module.exports = {
       const updatedSocket = await Socket.updateOne({physicalSocket: sensorId})
         .set({
           switchedOn: state[0].value === 0,
-          lastMessageReceived: new Date()
+          lastMessageReceived: Date.now()
         });
 
       if (!updatedSocket) {

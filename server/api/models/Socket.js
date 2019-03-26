@@ -49,9 +49,9 @@ module.exports = {
       defaultsTo: true
     },
     lastMessageReceived: {
-      type: 'number',
-      required: false,
-      allowNull: true
+      type: 'string',
+      columnType: 'bigint',
+      required: false
     }
   }
 };
