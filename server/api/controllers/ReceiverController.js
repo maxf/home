@@ -14,13 +14,9 @@ module.exports = {
       .filter(rec => rec.paramname === 'SWITCH_STATE');
 
     if (state.length === 1) {
-      const onOrOff = state[0].value === 0 ? 'off' : 'on';
-      console.log(`switch ${sensorId} is ${onOrOff}`);
-
-      // Now update model and update lastMessageReceived
       const updatedSocket = await Socket.updateOne({physicalSocket: sensorId})
         .set({
-          switchedOn: state[0].value === 0,
+          switchedOn: state[0].value !== 0,
           lastMessageReceived: Date.now()
         });
 
@@ -28,6 +24,7 @@ module.exports = {
         sails.log('failed to find and update socket ' + sensorId);
       } else {
         sails.log('updated socket' + sensorId);
+        console.log(updatedSocket);
       }
 
     } else {
