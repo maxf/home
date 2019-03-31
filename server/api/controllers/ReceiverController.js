@@ -24,14 +24,24 @@ module.exports = {
         sails.log('failed to find and update socket ' + sensorId);
       } else {
         sails.log('updated socket' + sensorId);
-        console.log(updatedSocket);
+        sails.sockets.broadcast('updates', 'ping', { deviceId: sensorId }, req);
       }
 
     } else {
       console.log(`switch ${sensorId} has no single SWITCH_STATE`);
     }
     return res.json(message);
+  },
+
+  subscribe: async function (req, res) {
+    if (!req.isSocket) {
+      return res.badRequest();
+    }
+    sails.sockets.join(req, 'updates');
+    return res.ok();
   }
+
+
 };
 
 /* payload

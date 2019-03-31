@@ -37,6 +37,8 @@ module.exports.routes = {
 
   'POST /set_switch/:device_id/:state': 'SocketController.setSwitch',
 
-  'POST /ping': 'ReceiverController.ping'
+  'POST /ping': 'ReceiverController.ping',
+
+  'GET /ping/subscribe': 'ReceiverController.subscribe'
 
 };
