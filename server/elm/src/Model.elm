@@ -1,6 +1,7 @@
-module Model exposing (Model, Msg(..), NewSocket, RestSockets(..), Socket, initialModel)
+module Model exposing (Model, Msg(..), NewSocket, RestSockets(..), Socket, PushMessage, initialModel)
 
 import Http
+import Json.Encode exposing (Value)
 
 
 type Msg
@@ -17,6 +18,14 @@ type Msg
     | SocketSwitched (Result Http.Error ())
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
+    | PushReceived PushMessage
+
+
+type alias PushMessage =
+    { deviceId : String
+    , isSwitchedOn : Bool
+    , timestamp : Int
+    }
 
 
 type alias NewSocket =
@@ -52,5 +61,5 @@ type alias Socket =
     , stopTime : Int
     , random : Bool
     , randomBreaks : Bool
-    , lastMessageReceived: Maybe Int
+    , lastMessageReceived : Maybe Int
     }

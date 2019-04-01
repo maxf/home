@@ -1,10 +1,11 @@
-module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder, socketsDecoder, subscriptions, update)
+port module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder, socketsDecoder, subscriptions, update)
 
 import Browser
 import Browser.Navigation as Nav
 import Http
 import Json.Decode exposing (Decoder, bool, int, list, map, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
+import Json.Encode exposing (Value)
 import Model exposing (..)
 import View exposing (view)
 
@@ -23,8 +24,8 @@ main =
         }
 
 
+port pushMessage : (PushMessage -> msg) -> Sub msg
 
--- MODEL
 
 
 timestampAsStringDecoder : Decoder (Maybe Int)
@@ -262,11 +263,37 @@ update msg model =
         SocketChanged (Ok _) ->
             ( model, Cmd.none )
 
+        PushReceived message ->
+            let
+                _ = Debug.log "Received" message
+            in
+            case model.sockets of
+                Sockets sockets ->
+                    let
+                        updateSwitch =
+                            \x ->
+                                if x.physicalId == message.deviceId then
+                                    { x
+                                        | switchedOn = message.isSwitchedOn
+                                        , lastMessageReceived = Just message.timestamp
+                                    }
+
+                                else
+                                    x
+
+                        newList =
+                            List.map updateSwitch sockets
+                    in
+                    ( { model | sockets = Sockets newList }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    pushMessage PushReceived

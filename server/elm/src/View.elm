@@ -79,7 +79,7 @@ toUtcString : Int -> String
 toUtcString time =
     let
         posix =
-            millisToPosix time |> Debug.log ">"
+            millisToPosix time
     in
         String.fromInt (toDay utc posix)
         ++ " " ++

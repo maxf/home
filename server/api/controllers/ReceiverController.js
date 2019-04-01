@@ -14,17 +14,24 @@ module.exports = {
       .filter(rec => rec.paramname === 'SWITCH_STATE');
 
     if (state.length === 1) {
+      const switchedOn = state[0].value !== 0;
+      const now = Date.now();
       const updatedSocket = await Socket.updateOne({physicalSocket: sensorId})
         .set({
-          switchedOn: state[0].value !== 0,
-          lastMessageReceived: Date.now()
+          switchedOn,
+          lastMessageReceived: now
         });
 
       if (!updatedSocket) {
         sails.log('failed to find and update socket ' + sensorId);
       } else {
         sails.log('updated socket' + sensorId);
-        sails.sockets.broadcast('updates', 'ping', { deviceId: sensorId }, req);
+        const payload = {
+          deviceId: sensorId,
+          isSwitchedOn: switchedOn,
+          lastMessageReceived: now
+        };
+        sails.sockets.broadcast('updates', 'ping', payload, req);
       }
 
     } else {

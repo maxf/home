@@ -4,10 +4,24 @@
    node: document.getElementById('elm')
  });
 
+
+
  io.socket.get('/ping/subscribe', () => {
    console.log('subcring');
    io.socket.on('ping', function (data) {
-     console.log('Socket ', data);
+     if (data
+         && data.deviceId
+         && (data.isSwitchedOn !== undefined)
+         && data.lastMessageReceived) {
+       const pushData = {
+         deviceId: data.deviceId.toString(),
+         isSwitchedOn: data.isSwitchedOn,
+         timestamp: data.lastMessageReceived
+       };
+       app.ports.pushMessage.send(pushData);
+     } else {
+       console.log('unexpected payload received from server:', data);
+     }
    });
  });
 
