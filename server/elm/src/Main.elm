@@ -7,6 +7,7 @@ import Json.Decode exposing (Decoder, bool, int, list, map, nullable, string, su
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode exposing (Value)
 import Model exposing (..)
+import Time exposing (posixToMillis)
 import View exposing (view)
 
 
@@ -150,11 +151,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SocketsReceived (Ok sockets) ->
-            let
-                newSockets =
-                    List.sortBy .id sockets
-            in
-            ( { model | sockets = Sockets newSockets }, Cmd.none )
+            ( { model | sockets = Sockets sockets }, Cmd.none )
 
         SocketsReceived (Err _) ->
             ( { model | sockets = Error }, Cmd.none )
@@ -277,7 +274,7 @@ update msg model =
                                         | switchedOn = message.isSwitchedOn
                                         , lastMessageReceived = Just message.timestamp
                                     }
-
+                                    -- in View, reset colour to green
                                 else
                                     x
 
@@ -289,6 +286,10 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        Tick time ->
+            ( { model | lastTick = time |> posixToMillis }
+            , Cmd.none
+            )
 
 
 -- SUBSCRIPTIONS
@@ -296,4 +297,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    pushMessage PushReceived
+    Sub.batch
+        [ pushMessage PushReceived
+        , Time.every 10000 Tick
+        ]
