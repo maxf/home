@@ -13,6 +13,7 @@ view model =
     { title = "Switches"
     , body =
         [ h1 [] [ text "Switches" ]
+        , p [] [ model.lastTick |> toUtcString |> text ]
         , case model.sockets of
             Error ->
                 p [] [ text "Error loading switches" ]
@@ -21,7 +22,12 @@ view model =
                 p [] [ text "Loading switches" ]
 
             Sockets sockets ->
-                ul [ class "sockets" ] (List.map viewSocket sockets)
+                ul
+                    [ class "sockets" ]
+                    (List.map
+                         (viewSocket model.lastTick)
+                         (List.sortBy .id sockets)
+                    )
         , section []
             [ h1 [] [ text "Add a switch" ]
             , viewAddSwitch
@@ -30,15 +36,30 @@ view model =
     }
 
 
-viewSocket : Socket -> Html Msg
-viewSocket socket =
+durationToSaturation : Int -> String
+durationToSaturation t =
+    let
+        secs = 20.0 -- time from 100% to 0% in ms
+        tf = toFloat t
+    in
+        if tf > 1000*secs
+        then "0"
+        else (100 * ( 1 - tf / (1000*secs))) |> String.fromFloat
+
+viewSocket : Int -> Socket -> Html Msg
+viewSocket time socket =
     let
         lastSeen =
             case socket.lastMessageReceived of
                 Nothing -> "never"
                 Just secs -> secs |> toUtcString
+        fadedColor =
+            case socket.lastMessageReceived of
+                Nothing -> "#000"
+                Just secs -> "hsl(120,"++ (durationToSaturation (time-secs)) ++"%,50%)"
+
     in
-    li [ class "socket" ]
+    li [ class "socket", style "background" fadedColor ]
         [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
         , h3 [] [ text (" is currently " ++ (if socket.switchedOn then "ON" else "OFF")) ]
         , p [] [ text ("Last seen: " ++ lastSeen) ]

@@ -2,7 +2,7 @@ module Model exposing (Model, Msg(..), NewSocket, RestSockets(..), Socket, PushM
 
 import Http
 import Json.Encode exposing (Value)
-
+import Time
 
 type Msg
     = SocketsReceived (Result Http.Error (List Socket))
@@ -19,7 +19,7 @@ type Msg
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
     | PushReceived PushMessage
-
+    | Tick Time.Posix
 
 type alias PushMessage =
     { deviceId : String
@@ -41,6 +41,7 @@ type RestSockets
 type alias Model =
     { sockets : RestSockets
     , newSocket : NewSocket
+    , lastTick: Int
     }
 
 
@@ -48,6 +49,7 @@ initialModel : Model
 initialModel =
     { sockets = Loading
     , newSocket = NewSocket ""
+    , lastTick = 0
     }
 
 

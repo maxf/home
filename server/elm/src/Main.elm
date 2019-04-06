@@ -274,7 +274,6 @@ update msg model =
                                         | switchedOn = message.isSwitchedOn
                                         , lastMessageReceived = Just message.timestamp
                                     }
-                                    -- in View, reset colour to green
                                 else
                                     x
 
@@ -299,5 +298,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ pushMessage PushReceived
-        , Time.every 10000 Tick
+        , Time.every 1000 Tick
         ]
