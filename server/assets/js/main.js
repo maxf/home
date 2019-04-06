@@ -2489,6 +2489,52 @@ function _Http_track(router, xhr, tracker)
 }
 
 
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2(elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
+
+
+
 
 // HELPERS
 
@@ -6505,16 +6551,331 @@ var author$project$Model$NewSocket = function (description) {
 	return {description: description};
 };
 var author$project$Model$initialModel = {
+	lastTick: 0,
 	newSocket: author$project$Model$NewSocket(''),
 	sockets: author$project$Model$Loading
 };
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(author$project$Model$initialModel, author$project$Main$fetchSockets);
 };
+var elm$json$Json$Decode$andThen = _Json_andThen;
+var author$project$Main$pushMessage = _Platform_incomingPort(
+	'pushMessage',
+	A2(
+		elm$json$Json$Decode$andThen,
+		function (timestamp) {
+			return A2(
+				elm$json$Json$Decode$andThen,
+				function (isSwitchedOn) {
+					return A2(
+						elm$json$Json$Decode$andThen,
+						function (deviceId) {
+							return elm$json$Json$Decode$succeed(
+								{deviceId: deviceId, isSwitchedOn: isSwitchedOn, timestamp: timestamp});
+						},
+						A2(elm$json$Json$Decode$field, 'deviceId', elm$json$Json$Decode$string));
+				},
+				A2(elm$json$Json$Decode$field, 'isSwitchedOn', elm$json$Json$Decode$bool));
+		},
+		A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$int)));
+var author$project$Model$PushReceived = function (a) {
+	return {$: 'PushReceived', a: a};
+};
+var author$project$Model$Tick = function (a) {
+	return {$: 'Tick', a: a};
+};
 var elm$core$Platform$Sub$batch = _Platform_batch;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Main$subscriptions = function (_n0) {
-	return elm$core$Platform$Sub$none;
+var elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 'Every', a: a, b: b};
+	});
+var elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {processes: processes, taggers: taggers};
+	});
+var elm$time$Time$init = elm$core$Task$succeed(
+	A2(elm$time$Time$State, elm$core$Dict$empty, elm$core$Dict$empty));
+var elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3(elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _n0) {
+				stepState:
+				while (true) {
+					var list = _n0.a;
+					var result = _n0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _n2 = list.a;
+						var lKey = _n2.a;
+						var lValue = _n2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_n0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_n0 = $temp$_n0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _n3 = A3(
+			elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _n3.a;
+		var intermediateResult = _n3.b;
+		return A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n4, result) {
+					var k = _n4.a;
+					var v = _n4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var elm$time$Time$addMySub = F2(
+	function (_n0, state) {
+		var interval = _n0.a;
+		var tagger = _n0.b;
+		var _n1 = A2(elm$core$Dict$get, interval, state);
+		if (_n1.$ === 'Nothing') {
+			return A3(
+				elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _n1.a;
+			return A3(
+				elm$core$Dict$insert,
+				interval,
+				A2(elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
+var elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var elm$time$Time$customZone = elm$time$Time$Zone;
+var elm$time$Time$setInterval = _Time_setInterval;
+var elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = elm$core$Process$spawn(
+				A2(
+					elm$time$Time$setInterval,
+					interval,
+					A2(elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3(elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2(elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var elm$time$Time$onEffects = F3(
+	function (router, subs, _n0) {
+		var processes = _n0.processes;
+		var rightStep = F3(
+			function (_n6, id, _n7) {
+				var spawns = _n7.a;
+				var existing = _n7.b;
+				var kills = _n7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						elm$core$Task$andThen,
+						function (_n5) {
+							return kills;
+						},
+						elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3(elm$core$List$foldl, elm$time$Time$addMySub, elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _n4) {
+				var spawns = _n4.a;
+				var existing = _n4.b;
+				var kills = _n4.c;
+				return _Utils_Tuple3(
+					A2(elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _n3) {
+				var spawns = _n3.a;
+				var existing = _n3.b;
+				var kills = _n3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3(elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _n1 = A6(
+			elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				elm$core$Dict$empty,
+				elm$core$Task$succeed(_Utils_Tuple0)));
+		var spawnList = _n1.a;
+		var existingDict = _n1.b;
+		var killTask = _n1.c;
+		return A2(
+			elm$core$Task$andThen,
+			function (newProcesses) {
+				return elm$core$Task$succeed(
+					A2(elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				elm$core$Task$andThen,
+				function (_n2) {
+					return A3(elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var elm$time$Time$millisToPosix = elm$time$Time$Posix;
+var elm$time$Time$now = _Time_now(elm$time$Time$millisToPosix);
+var elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _n0 = A2(elm$core$Dict$get, interval, state.taggers);
+		if (_n0.$ === 'Nothing') {
+			return elm$core$Task$succeed(state);
+		} else {
+			var taggers = _n0.a;
+			var tellTaggers = function (time) {
+				return elm$core$Task$sequence(
+					A2(
+						elm$core$List$map,
+						function (tagger) {
+							return A2(
+								elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				elm$core$Task$andThen,
+				function (_n1) {
+					return elm$core$Task$succeed(state);
+				},
+				A2(elm$core$Task$andThen, tellTaggers, elm$time$Time$now));
+		}
+	});
+var elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var elm$time$Time$subMap = F2(
+	function (f, _n0) {
+		var interval = _n0.a;
+		var tagger = _n0.b;
+		return A2(
+			elm$time$Time$Every,
+			interval,
+			A2(elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager(elm$time$Time$init, elm$time$Time$onEffects, elm$time$Time$onSelfMsg, 0, elm$time$Time$subMap);
+var elm$time$Time$subscription = _Platform_leaf('Time');
+var elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return elm$time$Time$subscription(
+			A2(elm$time$Time$Every, interval, tagger));
+	});
+var author$project$Main$subscriptions = function (model) {
+	return elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				author$project$Main$pushMessage(author$project$Model$PushReceived),
+				A2(elm$time$Time$every, 1000, author$project$Model$Tick)
+			]));
 };
 var author$project$Model$NewSocketAdded = function (a) {
 	return {$: 'NewSocketAdded', a: a};
@@ -6616,6 +6977,7 @@ var author$project$Model$Sockets = function (a) {
 	return {$: 'Sockets', a: a};
 };
 var elm$core$Basics$neq = _Utils_notEqual;
+var elm$core$Debug$log = _Debug_log;
 var elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6627,40 +6989,23 @@ var elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
-var elm$core$List$sortBy = _List_sortBy;
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
+var elm$time$Time$posixToMillis = function (_n0) {
+	var millis = _n0.a;
+	return millis;
+};
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'SocketsReceived':
 				if (msg.a.$ === 'Ok') {
 					var sockets = msg.a.a;
-					var newSockets = A2(
-						elm$core$List$sortBy,
-						function ($) {
-							return $.id;
-						},
-						sockets);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								sockets: author$project$Model$Sockets(newSockets)
+								sockets: author$project$Model$Sockets(sockets)
 							}),
 						elm$core$Platform$Cmd$none);
 				} else {
@@ -6813,7 +7158,7 @@ var author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					model,
 					author$project$Main$changeSocket(socket));
-			default:
+			case 'SocketChanged':
 				if (msg.a.$ === 'Err') {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -6823,135 +7168,42 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
+			case 'PushReceived':
+				var message = msg.a;
+				var _n6 = A2(elm$core$Debug$log, 'Received', message);
+				var _n7 = model.sockets;
+				if (_n7.$ === 'Sockets') {
+					var sockets = _n7.a;
+					var updateSwitch = function (x) {
+						return _Utils_eq(x.physicalId, message.deviceId) ? _Utils_update(
+							x,
+							{
+								lastMessageReceived: elm$core$Maybe$Just(message.timestamp),
+								switchedOn: message.isSwitchedOn
+							}) : x;
+					};
+					var newList = A2(elm$core$List$map, updateSwitch, sockets);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								sockets: author$project$Model$Sockets(newList)
+							}),
+						elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
+			default:
+				var time = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							lastTick: elm$time$Time$posixToMillis(time)
+						}),
+					elm$core$Platform$Cmd$none);
 		}
 	});
-var author$project$Model$NewSocketAdd = {$: 'NewSocketAdd'};
-var author$project$Model$NewSocketDescriptionChanged = function (a) {
-	return {$: 'NewSocketDescriptionChanged', a: a};
-};
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
-};
-var elm$html$Html$button = _VirtualDom_node('button');
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$html$Html$input = _VirtualDom_node('input');
-var elm$html$Html$label = _VirtualDom_node('label');
-var elm$html$Html$span = _VirtualDom_node('span');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		elm$html$Html$Events$on,
-		'click',
-		elm$json$Json$Decode$succeed(msg));
-};
-var elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
-	});
-var elm$html$Html$Events$targetValue = A2(
-	elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	elm$json$Json$Decode$string);
-var elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			elm$json$Json$Decode$map,
-			elm$html$Html$Events$alwaysStop,
-			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
-};
-var author$project$View$viewAddSwitch = A2(
-	elm$html$Html$div,
-	_List_Nil,
-	_List_fromArray(
-		[
-			A2(
-			elm$html$Html$label,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$span,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Description: ')
-						])),
-					A2(
-					elm$html$Html$input,
-					_List_fromArray(
-						[
-							elm$html$Html$Events$onInput(author$project$Model$NewSocketDescriptionChanged)
-						]),
-					_List_Nil)
-				])),
-			A2(
-			elm$html$Html$button,
-			_List_fromArray(
-				[
-					elm$html$Html$Events$onClick(author$project$Model$NewSocketAdd)
-				]),
-			_List_fromArray(
-				[
-					elm$html$Html$text('Add')
-				]))
-		]));
-var author$project$Model$ChangeSocket = function (a) {
-	return {$: 'ChangeSocket', a: a};
-};
-var author$project$Model$DeleteSocket = function (a) {
-	return {$: 'DeleteSocket', a: a};
-};
-var author$project$Model$SocketDescriptionChanged = F2(
-	function (a, b) {
-		return {$: 'SocketDescriptionChanged', a: a, b: b};
-	});
-var author$project$Model$SocketPhysicalIdChanged = F2(
-	function (a, b) {
-		return {$: 'SocketPhysicalIdChanged', a: a, b: b};
-	});
-var author$project$Model$SwitchOff = function (a) {
-	return {$: 'SwitchOff', a: a};
-};
-var author$project$Model$SwitchOn = function (a) {
-	return {$: 'SwitchOn', a: a};
-};
 var author$project$View$toEnglishMonth = function (month) {
 	switch (month.$) {
 		case 'Jan':
@@ -6980,19 +7232,10 @@ var author$project$View$toEnglishMonth = function (month) {
 			return 'Dec';
 	}
 };
-var elm$core$Debug$log = _Debug_log;
-var elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var elm$time$Time$millisToPosix = elm$time$Time$Posix;
 var elm$time$Time$flooredDiv = F2(
 	function (numerator, denominator) {
 		return elm$core$Basics$floor(numerator / denominator);
 	});
-var elm$time$Time$posixToMillis = function (_n0) {
-	var millis = _n0.a;
-	return millis;
-};
 var elm$time$Time$toAdjustedMinutesHelp = F3(
 	function (defaultOffset, posixMinutes, eras) {
 		toAdjustedMinutesHelp:
@@ -7129,16 +7372,9 @@ var elm$time$Time$toYear = F2(
 		return elm$time$Time$toCivil(
 			A2(elm$time$Time$toAdjustedMinutes, zone, time)).year;
 	});
-var elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
 var elm$time$Time$utc = A2(elm$time$Time$Zone, 0, _List_Nil);
 var author$project$View$toUtcString = function (time) {
-	var posix = A2(
-		elm$core$Debug$log,
-		'>',
-		elm$time$Time$millisToPosix(time));
+	var posix = elm$time$Time$millisToPosix(time);
 	return elm$core$String$fromInt(
 		A2(elm$time$Time$toDay, elm$time$Time$utc, posix)) + (' ' + (author$project$View$toEnglishMonth(
 		A2(elm$time$Time$toMonth, elm$time$Time$utc, posix)) + (' ' + (elm$core$String$fromInt(
@@ -7146,6 +7382,139 @@ var author$project$View$toUtcString = function (time) {
 		A2(elm$time$Time$toHour, elm$time$Time$utc, posix)) + (':' + (elm$core$String$fromInt(
 		A2(elm$time$Time$toMinute, elm$time$Time$utc, posix)) + (':' + (elm$core$String$fromInt(
 		A2(elm$time$Time$toSecond, elm$time$Time$utc, posix)) + ' (UTC)'))))))))));
+};
+var author$project$Model$NewSocketAdd = {$: 'NewSocketAdd'};
+var author$project$Model$NewSocketDescriptionChanged = function (a) {
+	return {$: 'NewSocketDescriptionChanged', a: a};
+};
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$input = _VirtualDom_node('input');
+var elm$html$Html$label = _VirtualDom_node('label');
+var elm$html$Html$span = _VirtualDom_node('span');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
+var author$project$View$viewAddSwitch = A2(
+	elm$html$Html$div,
+	_List_Nil,
+	_List_fromArray(
+		[
+			A2(
+			elm$html$Html$label,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Description: ')
+						])),
+					A2(
+					elm$html$Html$input,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onInput(author$project$Model$NewSocketDescriptionChanged)
+						]),
+					_List_Nil)
+				])),
+			A2(
+			elm$html$Html$button,
+			_List_fromArray(
+				[
+					elm$html$Html$Events$onClick(author$project$Model$NewSocketAdd)
+				]),
+			_List_fromArray(
+				[
+					elm$html$Html$text('Add')
+				]))
+		]));
+var author$project$Model$ChangeSocket = function (a) {
+	return {$: 'ChangeSocket', a: a};
+};
+var author$project$Model$DeleteSocket = function (a) {
+	return {$: 'DeleteSocket', a: a};
+};
+var author$project$Model$SocketDescriptionChanged = F2(
+	function (a, b) {
+		return {$: 'SocketDescriptionChanged', a: a, b: b};
+	});
+var author$project$Model$SocketPhysicalIdChanged = F2(
+	function (a, b) {
+		return {$: 'SocketPhysicalIdChanged', a: a, b: b};
+	});
+var author$project$Model$SwitchOff = function (a) {
+	return {$: 'SwitchOff', a: a};
+};
+var author$project$Model$SwitchOn = function (a) {
+	return {$: 'SwitchOn', a: a};
+};
+var elm$core$String$fromFloat = _String_fromNumber;
+var author$project$View$durationToSaturation = function (t) {
+	var tf = t;
+	var secs = 20.0;
+	return (_Utils_cmp(tf, 1000 * secs) > 0) ? '0' : elm$core$String$fromFloat(100 * (1 - (tf / (1000 * secs))));
 };
 var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$h2 = _VirtualDom_node('h2');
@@ -7161,139 +7530,153 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
-var author$project$View$viewSocket = function (socket) {
-	var lastSeen = function () {
-		var _n0 = socket.lastMessageReceived;
-		if (_n0.$ === 'Nothing') {
-			return 'never';
-		} else {
-			var secs = _n0.a;
-			return author$project$View$toUtcString(secs);
-		}
-	}();
-	return A2(
-		elm$html$Html$li,
-		_List_fromArray(
-			[
-				elm$html$Html$Attributes$class('socket')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				elm$html$Html$h2,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text(
-						'Socket ' + elm$core$String$fromInt(socket.id))
-					])),
-				A2(
-				elm$html$Html$h3,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text(
-						' is currently ' + (socket.switchedOn ? 'ON' : 'OFF'))
-					])),
-				A2(
-				elm$html$Html$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('Last seen: ' + lastSeen)
-					])),
-				A2(
-				elm$html$Html$label,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('Physical socket: '),
-						A2(
-						elm$html$Html$input,
-						_List_fromArray(
-							[
-								elm$html$Html$Events$onInput(
-								author$project$Model$SocketPhysicalIdChanged(socket.id)),
-								elm$html$Html$Attributes$value(socket.physicalId)
-							]),
-						_List_Nil)
-					])),
-				A2(elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				elm$html$Html$label,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('Description: '),
-						A2(
-						elm$html$Html$input,
-						_List_fromArray(
-							[
-								elm$html$Html$Events$onInput(
-								author$project$Model$SocketDescriptionChanged(socket.id)),
-								elm$html$Html$Attributes$value(socket.description)
-							]),
-						_List_Nil)
-					])),
-				A2(elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				elm$html$Html$button,
-				_List_fromArray(
-					[
-						elm$html$Html$Events$onClick(
-						author$project$Model$SwitchOn(socket))
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text('Switch on')
-					])),
-				A2(
-				elm$html$Html$button,
-				_List_fromArray(
-					[
-						elm$html$Html$Events$onClick(
-						author$project$Model$SwitchOff(socket))
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text('Switch off')
-					])),
-				A2(elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('buttons')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$button,
-						_List_fromArray(
-							[
-								elm$html$Html$Events$onClick(
-								author$project$Model$ChangeSocket(socket))
-							]),
-						_List_fromArray(
-							[
-								elm$html$Html$text('Change')
-							])),
-						elm$html$Html$text(' - '),
-						A2(
-						elm$html$Html$button,
-						_List_fromArray(
-							[
-								elm$html$Html$Events$onClick(
-								author$project$Model$DeleteSocket(socket.id))
-							]),
-						_List_fromArray(
-							[
-								elm$html$Html$text('Delete')
-							]))
-					]))
-			]));
-};
+var author$project$View$viewSocket = F2(
+	function (time, socket) {
+		var lastSeen = function () {
+			var _n1 = socket.lastMessageReceived;
+			if (_n1.$ === 'Nothing') {
+				return 'never';
+			} else {
+				var secs = _n1.a;
+				return author$project$View$toUtcString(secs);
+			}
+		}();
+		var fadedColor = function () {
+			var _n0 = socket.lastMessageReceived;
+			if (_n0.$ === 'Nothing') {
+				return '#000';
+			} else {
+				var secs = _n0.a;
+				return 'hsl(120,' + (author$project$View$durationToSaturation(time - secs) + '%,50%)');
+			}
+		}();
+		return A2(
+			elm$html$Html$li,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$class('socket'),
+					A2(elm$html$Html$Attributes$style, 'background', fadedColor)
+				]),
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$h2,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text(
+							'Socket ' + elm$core$String$fromInt(socket.id))
+						])),
+					A2(
+					elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text(
+							' is currently ' + (socket.switchedOn ? 'ON' : 'OFF'))
+						])),
+					A2(
+					elm$html$Html$p,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Last seen: ' + lastSeen)
+						])),
+					A2(
+					elm$html$Html$label,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Physical socket: '),
+							A2(
+							elm$html$Html$input,
+							_List_fromArray(
+								[
+									elm$html$Html$Events$onInput(
+									author$project$Model$SocketPhysicalIdChanged(socket.id)),
+									elm$html$Html$Attributes$value(socket.physicalId)
+								]),
+							_List_Nil)
+						])),
+					A2(elm$html$Html$br, _List_Nil, _List_Nil),
+					A2(
+					elm$html$Html$label,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Description: '),
+							A2(
+							elm$html$Html$input,
+							_List_fromArray(
+								[
+									elm$html$Html$Events$onInput(
+									author$project$Model$SocketDescriptionChanged(socket.id)),
+									elm$html$Html$Attributes$value(socket.description)
+								]),
+							_List_Nil)
+						])),
+					A2(elm$html$Html$br, _List_Nil, _List_Nil),
+					A2(
+					elm$html$Html$button,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onClick(
+							author$project$Model$SwitchOn(socket))
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('Switch on')
+						])),
+					A2(
+					elm$html$Html$button,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onClick(
+							author$project$Model$SwitchOff(socket))
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('Switch off')
+						])),
+					A2(elm$html$Html$br, _List_Nil, _List_Nil),
+					A2(
+					elm$html$Html$div,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('buttons')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							elm$html$Html$button,
+							_List_fromArray(
+								[
+									elm$html$Html$Events$onClick(
+									author$project$Model$ChangeSocket(socket))
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Change')
+								])),
+							elm$html$Html$text(' - '),
+							A2(
+							elm$html$Html$button,
+							_List_fromArray(
+								[
+									elm$html$Html$Events$onClick(
+									author$project$Model$DeleteSocket(socket.id))
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Delete')
+								]))
+						]))
+				]));
+	});
+var elm$core$List$sortBy = _List_sortBy;
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$section = _VirtualDom_node('section');
 var elm$html$Html$ul = _VirtualDom_node('ul');
@@ -7307,6 +7690,14 @@ var author$project$View$view = function (model) {
 				_List_fromArray(
 					[
 						elm$html$Html$text('Switches')
+					])),
+				A2(
+				elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						author$project$View$toUtcString(model.lastTick))
 					])),
 				function () {
 				var _n0 = model.sockets;
@@ -7335,7 +7726,15 @@ var author$project$View$view = function (model) {
 								[
 									elm$html$Html$Attributes$class('sockets')
 								]),
-							A2(elm$core$List$map, author$project$View$viewSocket, sockets));
+							A2(
+								elm$core$List$map,
+								author$project$View$viewSocket(model.lastTick),
+								A2(
+									elm$core$List$sortBy,
+									function ($) {
+										return $.id;
+									},
+									sockets)));
 				}
 			}(),
 				A2(
@@ -7612,8 +8011,6 @@ var elm$browser$Debugger$Overlay$viewBadMetadata = function (_n0) {
 };
 var elm$browser$Debugger$Overlay$Cancel = {$: 'Cancel'};
 var elm$browser$Debugger$Overlay$Proceed = {$: 'Proceed'};
-var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$browser$Debugger$Overlay$viewButtons = function (buttons) {
 	var btn = F2(
 		function (msg, string) {
@@ -8390,11 +8787,6 @@ var elm$browser$Debugger$Expando$viewTinyRecordHelp = F3(
 									otherHtmls)))));
 			}
 		}
-	});
-var elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
 	});
 var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
@@ -9442,31 +9834,6 @@ var elm$browser$Debugger$Metadata$collectBadUnions = F3(
 				list);
 		}
 	});
-var elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3(elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
-			}
-		}
-	});
 var elm$browser$Debugger$Metadata$isPortable = function (_n0) {
 	var types = _n0.types;
 	var badAliases = A3(elm$core$Dict$foldl, elm$browser$Debugger$Metadata$collectBadAliases, _List_Nil, types.aliases);
@@ -10389,67 +10756,6 @@ var elm$browser$Debugger$Report$hasTagChanges = function (tagChanges) {
 		tagChanges,
 		A4(elm$browser$Debugger$Report$TagChanges, _List_Nil, _List_Nil, _List_Nil, true));
 };
-var elm$core$Dict$merge = F6(
-	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
-		var stepState = F3(
-			function (rKey, rValue, _n0) {
-				stepState:
-				while (true) {
-					var list = _n0.a;
-					var result = _n0.b;
-					if (!list.b) {
-						return _Utils_Tuple2(
-							list,
-							A3(rightStep, rKey, rValue, result));
-					} else {
-						var _n2 = list.a;
-						var lKey = _n2.a;
-						var lValue = _n2.b;
-						var rest = list.b;
-						if (_Utils_cmp(lKey, rKey) < 0) {
-							var $temp$rKey = rKey,
-								$temp$rValue = rValue,
-								$temp$_n0 = _Utils_Tuple2(
-								rest,
-								A3(leftStep, lKey, lValue, result));
-							rKey = $temp$rKey;
-							rValue = $temp$rValue;
-							_n0 = $temp$_n0;
-							continue stepState;
-						} else {
-							if (_Utils_cmp(lKey, rKey) > 0) {
-								return _Utils_Tuple2(
-									list,
-									A3(rightStep, rKey, rValue, result));
-							} else {
-								return _Utils_Tuple2(
-									rest,
-									A4(bothStep, lKey, lValue, rValue, result));
-							}
-						}
-					}
-				}
-			});
-		var _n3 = A3(
-			elm$core$Dict$foldl,
-			stepState,
-			_Utils_Tuple2(
-				elm$core$Dict$toList(leftDict),
-				initialResult),
-			rightDict);
-		var leftovers = _n3.a;
-		var intermediateResult = _n3.b;
-		return A3(
-			elm$core$List$foldl,
-			F2(
-				function (_n4, result) {
-					var k = _n4.a;
-					var v = _n4.b;
-					return A3(leftStep, k, v, result);
-				}),
-			intermediateResult,
-			leftovers);
-	});
 var elm$browser$Debugger$Metadata$checkUnion = F4(
 	function (name, old, _new, changes) {
 		var tagChanges = A6(
@@ -10950,4 +11256,4 @@ var elm$browser$Browser$document = _Browser_document;
 var author$project$Main$main = elm$browser$Browser$document(
 	{init: author$project$Main$init, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$View$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Model.Msg","aliases":{"Model.Socket":{"args":[],"type":"{ id : Basics.Int, description : String.String, physicalId : String.String, timerMode : Basics.Bool, switchedOn : Basics.Bool, startTime : Basics.Int, stopTime : Basics.Int, random : Basics.Bool, randomBreaks : Basics.Bool, lastMessageReceived : Maybe.Maybe Basics.Int }"}},"unions":{"Model.Msg":{"args":[],"tags":{"SocketsReceived":["Result.Result Http.Error (List.List Model.Socket)"],"DeleteSocket":["Basics.Int"],"SocketDeleted":["Result.Result Http.Error ()"],"NewSocketDescriptionChanged":["String.String"],"NewSocketAdd":[],"NewSocketAdded":["Result.Result Http.Error Model.Socket"],"SocketDescriptionChanged":["Basics.Int","String.String"],"SocketPhysicalIdChanged":["Basics.Int","String.String"],"SwitchOn":["Model.Socket"],"SwitchOff":["Model.Socket"],"SocketSwitched":["Result.Result Http.Error ()"],"ChangeSocket":["Model.Socket"],"SocketChanged":["Result.Result Http.Error ()"]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"List.List":{"args":["a"],"tags":{}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"String.String":{"args":[],"tags":{"String":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}}}}})}});}(this));
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Model.Msg","aliases":{"Model.PushMessage":{"args":[],"type":"{ deviceId : String.String, isSwitchedOn : Basics.Bool, timestamp : Basics.Int }"},"Model.Socket":{"args":[],"type":"{ id : Basics.Int, description : String.String, physicalId : String.String, timerMode : Basics.Bool, switchedOn : Basics.Bool, startTime : Basics.Int, stopTime : Basics.Int, random : Basics.Bool, randomBreaks : Basics.Bool, lastMessageReceived : Maybe.Maybe Basics.Int }"}},"unions":{"Model.Msg":{"args":[],"tags":{"SocketsReceived":["Result.Result Http.Error (List.List Model.Socket)"],"DeleteSocket":["Basics.Int"],"SocketDeleted":["Result.Result Http.Error ()"],"NewSocketDescriptionChanged":["String.String"],"NewSocketAdd":[],"NewSocketAdded":["Result.Result Http.Error Model.Socket"],"SocketDescriptionChanged":["Basics.Int","String.String"],"SocketPhysicalIdChanged":["Basics.Int","String.String"],"SwitchOn":["Model.Socket"],"SwitchOff":["Model.Socket"],"SocketSwitched":["Result.Result Http.Error ()"],"ChangeSocket":["Model.Socket"],"SocketChanged":["Result.Result Http.Error ()"],"PushReceived":["Model.PushMessage"],"Tick":["Time.Posix"]}},"Basics.Bool":{"args":[],"tags":{"True":[],"False":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"List.List":{"args":["a"],"tags":{}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"String.String":{"args":[],"tags":{"String":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Time.Posix":{"args":[],"tags":{"Posix":["Basics.Int"]}}}}})}});}(this));
