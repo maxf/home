@@ -62,6 +62,7 @@ viewSocket time socket =
     li [ class "socket", style "background" fadedColor ]
         [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
         , h3 [] [ text (" is currently " ++ (if socket.switchedOn then "ON" else "OFF")) ]
+        , p [] [ text ("Power: " ++ (socket.realPower |> String.fromFloat)) ]
         , p [] [ text ("Last seen: " ++ lastSeen) ]
         , label []
             [ text "Physical socket: "

@@ -12,13 +12,17 @@ module.exports = {
     const sensorId = message.header.sensorid;
     const state = message.recs
       .filter(rec => rec.paramname === 'SWITCH_STATE');
+    const power = message.recs
+      .filter(rec => rec.paramname === 'REAL_POWER');
 
     if (state.length === 1) {
       const switchedOn = state[0].value !== 0;
+      const realPower = power.length === 1 ? power[0].value : 0;
       const now = Date.now();
       const updatedSocket = await Socket.updateOne({physicalSocket: sensorId})
         .set({
           switchedOn,
+          realPower,
           lastMessageReceived: now
         });
 
@@ -29,6 +33,7 @@ module.exports = {
         const payload = {
           deviceId: sensorId,
           isSwitchedOn: switchedOn,
+          realPower: realPower,
           lastMessageReceived: now
         };
         sails.sockets.broadcast('updates', 'ping', payload, req);

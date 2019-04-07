@@ -28,6 +28,11 @@ module.exports = {
       required: false,
       defaultsTo: false
     },
+    realPower: {
+      type: 'number',
+      defaultsTo: 0,
+      required: false
+    },
     startTime: { // when the socket gets switched on (in minutes after midnight)
       type: 'number',
       defaultsTo: 0,

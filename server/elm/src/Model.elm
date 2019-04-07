@@ -59,6 +59,7 @@ type alias Socket =
     , physicalId : String
     , timerMode : Bool
     , switchedOn : Bool
+    , realPower : Float
     , startTime : Int
     , stopTime : Int
     , random : Bool

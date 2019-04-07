@@ -3,7 +3,7 @@ port module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder
 import Browser
 import Browser.Navigation as Nav
 import Http
-import Json.Decode exposing (Decoder, bool, int, list, map, nullable, string, succeed)
+import Json.Decode exposing (Decoder, bool, int, list, map, nullable, string, succeed, float)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode exposing (Value)
 import Model exposing (..)
@@ -52,6 +52,7 @@ socketDecoder =
         |> required "physicalSocket" string
         |> required "timerMode" bool
         |> required "switchedOn" bool
+        |> required "realPower" float
         |> required "startTime" int
         |> required "stopTime" int
         |> required "random" bool
