@@ -33,6 +33,21 @@ module.exports = {
       defaultsTo: 0,
       required: false
     },
+    reactivePower: {
+      type: 'number',
+      defaultsTo: 0,
+      required: false
+    },
+    voltage: {
+      type: 'number',
+      defaultsTo: 0,
+      required: false
+    },
+    frequency: {
+      type: 'number',
+      defaultsTo: 0,
+      required: false
+    },
     startTime: { // when the socket gets switched on (in minutes after midnight)
       type: 'number',
       defaultsTo: 0,

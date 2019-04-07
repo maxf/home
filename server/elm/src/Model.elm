@@ -1,8 +1,9 @@
-module Model exposing (Model, Msg(..), NewSocket, RestSockets(..), Socket, PushMessage, initialModel)
+module Model exposing (Model, Msg(..), NewSocket, PushMessage, RestSockets(..), Socket, initialModel)
 
 import Http
 import Json.Encode exposing (Value)
 import Time
+
 
 type Msg
     = SocketsReceived (Result Http.Error (List Socket))
@@ -21,10 +22,17 @@ type Msg
     | PushReceived PushMessage
     | Tick Time.Posix
 
+
 type alias PushMessage =
     { deviceId : String
-    , isSwitchedOn : Bool
-    , timestamp : Int
+    , lastMessageReceived : Int
+    , records :
+        { switchedOn : Bool
+        , realPower : Float
+        , reactivePower : Float
+        , frequency : Float
+        , voltage : Float
+        }
     }
 
 
@@ -41,7 +49,7 @@ type RestSockets
 type alias Model =
     { sockets : RestSockets
     , newSocket : NewSocket
-    , lastTick: Int
+    , lastTick : Int
     }
 
 
@@ -60,6 +68,9 @@ type alias Socket =
     , timerMode : Bool
     , switchedOn : Bool
     , realPower : Float
+    , reactivePower : Float
+    , frequency : Float
+    , voltage : Float
     , startTime : Int
     , stopTime : Int
     , random : Bool

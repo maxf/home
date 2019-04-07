@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Model exposing (..)
-import Time exposing (Month(..), utc, toHour, toMinute, toSecond, millisToPosix, toDay, toMonth, toYear)
+import Time exposing (Month(..), millisToPosix, toDay, toHour, toMinute, toMonth, toSecond, toYear, utc)
 
 
 view : Model -> Browser.Document Msg
@@ -25,8 +25,8 @@ view model =
                 ul
                     [ class "sockets" ]
                     (List.map
-                         (viewSocket model.lastTick)
-                         (List.sortBy .id sockets)
+                        (viewSocket model.lastTick)
+                        (List.sortBy .id sockets)
                     )
         , section []
             [ h1 [] [ text "Add a switch" ]
@@ -39,31 +39,59 @@ view model =
 durationToSaturation : Int -> String
 durationToSaturation t =
     let
-        secs = 20.0 -- time from 100% to 0% in ms
-        tf = toFloat t
+        secs =
+            20.0
+
+        -- time from 100% to 0% in ms
+        tf =
+            toFloat t
     in
-        if tf > 1000*secs
-        then "0"
-        else (100 * ( 1 - tf / (1000*secs))) |> String.fromFloat
+    if tf > 1000 * secs then
+        "0"
+
+    else
+        (100 * (1 - tf / (1000 * secs))) |> String.fromFloat
+
 
 viewSocket : Int -> Socket -> Html Msg
 viewSocket time socket =
     let
         lastSeen =
             case socket.lastMessageReceived of
-                Nothing -> "never"
-                Just secs -> secs |> toUtcString
+                Nothing ->
+                    "never"
+
+                Just secs ->
+                    secs |> toUtcString
+
         fadedColor =
             case socket.lastMessageReceived of
-                Nothing -> "#000"
-                Just secs -> "hsl(120,"++ (durationToSaturation (time-secs)) ++"%,50%)"
+                Nothing ->
+                    "#000"
 
+                Just secs ->
+                    "hsl(120," ++ durationToSaturation (time - secs) ++ "%,50%)"
     in
     li [ class "socket", style "background" fadedColor ]
         [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
-        , h3 [] [ text (" is currently " ++ (if socket.switchedOn then "ON" else "OFF")) ]
-        , p [] [ text ("Power: " ++ (socket.realPower |> String.fromFloat)) ]
-        , p [] [ text ("Last seen: " ++ lastSeen) ]
+        , h3 []
+            [ text
+                (" is currently "
+                    ++ (if socket.switchedOn then
+                            "ON"
+
+                        else
+                            "OFF"
+                       )
+                )
+            ]
+        , ul []
+            [ li [] [ text ("Last seen: " ++ lastSeen) ]
+            , li [] [ text ("Power: " ++ (socket.realPower |> String.fromFloat)) ]
+            , li [] [ text ("Reactive Power: " ++ (socket.reactivePower |> String.fromFloat)) ]
+            , li [] [ text ("Frequency: " ++ (socket.frequency |> String.fromFloat)) ]
+            , li [] [ text ("Voltage: " ++ (socket.voltage |> String.fromFloat)) ]
+            ]
         , label []
             [ text "Physical socket: "
             , input [ onInput (SocketPhysicalIdChanged socket.id), value socket.physicalId ] []
@@ -96,39 +124,61 @@ viewAddSwitch =
         ]
 
 
-
 toUtcString : Int -> String
 toUtcString time =
     let
         posix =
             millisToPosix time
     in
-        String.fromInt (toDay utc posix)
-        ++ " " ++
-        toEnglishMonth (toMonth utc posix)
-        ++ " " ++
-        String.fromInt (toYear utc posix)
-        ++ " at " ++
-        String.fromInt (toHour utc posix)
-        ++ ":" ++
-        String.fromInt (toMinute utc posix)
-        ++ ":" ++
-        String.fromInt (toSecond utc posix)
+    String.fromInt (toDay utc posix)
+        ++ " "
+        ++ toEnglishMonth (toMonth utc posix)
+        ++ " "
+        ++ String.fromInt (toYear utc posix)
+        ++ " at "
+        ++ String.fromInt (toHour utc posix)
+        ++ ":"
+        ++ String.fromInt (toMinute utc posix)
+        ++ ":"
+        ++ String.fromInt (toSecond utc posix)
         ++ " (UTC)"
 
 
 toEnglishMonth : Month -> String
 toEnglishMonth month =
-  case month of
-    Jan -> "Jan"
-    Feb -> "Feb"
-    Mar -> "Mar"
-    Apr -> "Apr"
-    May -> "Mai"
-    Jun -> "Jun"
-    Jul -> "Jul"
-    Aug -> "Aug"
-    Sep -> "Sep"
-    Oct -> "Oct"
-    Nov -> "Nov"
-    Dec -> "Dec"
+    case month of
+        Jan ->
+            "Jan"
+
+        Feb ->
+            "Feb"
+
+        Mar ->
+            "Mar"
+
+        Apr ->
+            "Apr"
+
+        May ->
+            "Mai"
+
+        Jun ->
+            "Jun"
+
+        Jul ->
+            "Jul"
+
+        Aug ->
+            "Aug"
+
+        Sep ->
+            "Sep"
+
+        Oct ->
+            "Oct"
+
+        Nov ->
+            "Nov"
+
+        Dec ->
+            "Dec"

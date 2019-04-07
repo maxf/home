@@ -3,7 +3,7 @@ port module Main exposing (fetchSockets, init, main, removeSocket, socketDecoder
 import Browser
 import Browser.Navigation as Nav
 import Http
-import Json.Decode exposing (Decoder, bool, int, list, map, nullable, string, succeed, float)
+import Json.Decode exposing (Decoder, bool, float, int, list, map, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode exposing (Value)
 import Model exposing (..)
@@ -26,7 +26,6 @@ main =
 
 
 port pushMessage : (PushMessage -> msg) -> Sub msg
-
 
 
 timestampAsStringDecoder : Decoder (Maybe Int)
@@ -53,6 +52,9 @@ socketDecoder =
         |> required "timerMode" bool
         |> required "switchedOn" bool
         |> required "realPower" float
+        |> required "reactivePower" float
+        |> required "frequency" float
+        |> required "voltage" float
         |> required "startTime" int
         |> required "stopTime" int
         |> required "random" bool
@@ -262,9 +264,6 @@ update msg model =
             ( model, Cmd.none )
 
         PushReceived message ->
-            let
-                _ = Debug.log "Received" message
-            in
             case model.sockets of
                 Sockets sockets ->
                     let
@@ -272,9 +271,14 @@ update msg model =
                             \x ->
                                 if x.physicalId == message.deviceId then
                                     { x
-                                        | switchedOn = message.isSwitchedOn
-                                        , lastMessageReceived = Just message.timestamp
+                                        | switchedOn = message.records.switchedOn
+                                        , lastMessageReceived = Just message.lastMessageReceived
+                                        , realPower = message.records.realPower
+                                        , reactivePower = message.records.reactivePower
+                                        , frequency = message.records.frequency
+                                        , voltage = message.records.voltage
                                     }
+
                                 else
                                     x
 
@@ -290,6 +294,7 @@ update msg model =
             ( { model | lastTick = time |> posixToMillis }
             , Cmd.none
             )
+
 
 
 -- SUBSCRIPTIONS

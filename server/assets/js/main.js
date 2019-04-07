@@ -5036,12 +5036,18 @@ var author$project$Model$Socket = function (id) {
 			return function (timerMode) {
 				return function (switchedOn) {
 					return function (realPower) {
-						return function (startTime) {
-							return function (stopTime) {
-								return function (random) {
-									return function (randomBreaks) {
-										return function (lastMessageReceived) {
-											return {description: description, id: id, lastMessageReceived: lastMessageReceived, physicalId: physicalId, random: random, randomBreaks: randomBreaks, realPower: realPower, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode};
+						return function (reactivePower) {
+							return function (frequency) {
+								return function (voltage) {
+									return function (startTime) {
+										return function (stopTime) {
+											return function (random) {
+												return function (randomBreaks) {
+													return function (lastMessageReceived) {
+														return {description: description, frequency: frequency, id: id, lastMessageReceived: lastMessageReceived, physicalId: physicalId, random: random, randomBreaks: randomBreaks, reactivePower: reactivePower, realPower: realPower, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode, voltage: voltage};
+													};
+												};
+											};
 										};
 									};
 								};
@@ -5079,29 +5085,41 @@ var author$project$Main$socketDecoder = A3(
 					elm$json$Json$Decode$int,
 					A3(
 						NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-						'realPower',
+						'voltage',
 						elm$json$Json$Decode$float,
 						A3(
 							NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-							'switchedOn',
-							elm$json$Json$Decode$bool,
+							'frequency',
+							elm$json$Json$Decode$float,
 							A3(
 								NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-								'timerMode',
-								elm$json$Json$Decode$bool,
+								'reactivePower',
+								elm$json$Json$Decode$float,
 								A3(
 									NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-									'physicalSocket',
-									elm$json$Json$Decode$string,
+									'realPower',
+									elm$json$Json$Decode$float,
 									A3(
 										NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-										'description',
-										elm$json$Json$Decode$string,
+										'switchedOn',
+										elm$json$Json$Decode$bool,
 										A3(
 											NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-											'id',
-											elm$json$Json$Decode$int,
-											elm$json$Json$Decode$succeed(author$project$Model$Socket))))))))))));
+											'timerMode',
+											elm$json$Json$Decode$bool,
+											A3(
+												NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+												'physicalSocket',
+												elm$json$Json$Decode$string,
+												A3(
+													NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+													'description',
+													elm$json$Json$Decode$string,
+													A3(
+														NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+														'id',
+														elm$json$Json$Decode$int,
+														elm$json$Json$Decode$succeed(author$project$Model$Socket)))))))))))))));
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Main$socketsDecoder = elm$json$Json$Decode$list(author$project$Main$socketDecoder);
 var author$project$Model$SocketsReceived = function (a) {
@@ -6010,21 +6028,50 @@ var author$project$Main$pushMessage = _Platform_incomingPort(
 	'pushMessage',
 	A2(
 		elm$json$Json$Decode$andThen,
-		function (timestamp) {
+		function (records) {
 			return A2(
 				elm$json$Json$Decode$andThen,
-				function (isSwitchedOn) {
+				function (lastMessageReceived) {
 					return A2(
 						elm$json$Json$Decode$andThen,
 						function (deviceId) {
 							return elm$json$Json$Decode$succeed(
-								{deviceId: deviceId, isSwitchedOn: isSwitchedOn, timestamp: timestamp});
+								{deviceId: deviceId, lastMessageReceived: lastMessageReceived, records: records});
 						},
 						A2(elm$json$Json$Decode$field, 'deviceId', elm$json$Json$Decode$string));
 				},
-				A2(elm$json$Json$Decode$field, 'isSwitchedOn', elm$json$Json$Decode$bool));
+				A2(elm$json$Json$Decode$field, 'lastMessageReceived', elm$json$Json$Decode$int));
 		},
-		A2(elm$json$Json$Decode$field, 'timestamp', elm$json$Json$Decode$int)));
+		A2(
+			elm$json$Json$Decode$field,
+			'records',
+			A2(
+				elm$json$Json$Decode$andThen,
+				function (voltage) {
+					return A2(
+						elm$json$Json$Decode$andThen,
+						function (switchedOn) {
+							return A2(
+								elm$json$Json$Decode$andThen,
+								function (realPower) {
+									return A2(
+										elm$json$Json$Decode$andThen,
+										function (reactivePower) {
+											return A2(
+												elm$json$Json$Decode$andThen,
+												function (frequency) {
+													return elm$json$Json$Decode$succeed(
+														{frequency: frequency, reactivePower: reactivePower, realPower: realPower, switchedOn: switchedOn, voltage: voltage});
+												},
+												A2(elm$json$Json$Decode$field, 'frequency', elm$json$Json$Decode$float));
+										},
+										A2(elm$json$Json$Decode$field, 'reactivePower', elm$json$Json$Decode$float));
+								},
+								A2(elm$json$Json$Decode$field, 'realPower', elm$json$Json$Decode$float));
+						},
+						A2(elm$json$Json$Decode$field, 'switchedOn', elm$json$Json$Decode$bool));
+				},
+				A2(elm$json$Json$Decode$field, 'voltage', elm$json$Json$Decode$float)))));
 var author$project$Model$PushReceived = function (a) {
 	return {$: 'PushReceived', a: a};
 };
@@ -6424,7 +6471,6 @@ var author$project$Model$Sockets = function (a) {
 	return {$: 'Sockets', a: a};
 };
 var elm$core$Basics$neq = _Utils_notEqual;
-var elm$core$Debug$log = _Debug_log;
 var elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -6617,16 +6663,19 @@ var author$project$Main$update = F2(
 				}
 			case 'PushReceived':
 				var message = msg.a;
-				var _n6 = A2(elm$core$Debug$log, 'Received', message);
-				var _n7 = model.sockets;
-				if (_n7.$ === 'Sockets') {
-					var sockets = _n7.a;
+				var _n6 = model.sockets;
+				if (_n6.$ === 'Sockets') {
+					var sockets = _n6.a;
 					var updateSwitch = function (x) {
 						return _Utils_eq(x.physicalId, message.deviceId) ? _Utils_update(
 							x,
 							{
-								lastMessageReceived: elm$core$Maybe$Just(message.timestamp),
-								switchedOn: message.isSwitchedOn
+								frequency: message.records.frequency,
+								lastMessageReceived: elm$core$Maybe$Just(message.lastMessageReceived),
+								reactivePower: message.records.reactivePower,
+								realPower: message.records.realPower,
+								switchedOn: message.records.switchedOn,
+								voltage: message.records.voltage
 							}) : x;
 					};
 					var newList = A2(elm$core$List$map, updateSwitch, sockets);
@@ -6967,7 +7016,7 @@ var elm$html$Html$br = _VirtualDom_node('br');
 var elm$html$Html$h2 = _VirtualDom_node('h2');
 var elm$html$Html$h3 = _VirtualDom_node('h3');
 var elm$html$Html$li = _VirtualDom_node('li');
-var elm$html$Html$p = _VirtualDom_node('p');
+var elm$html$Html$ul = _VirtualDom_node('ul');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -7026,19 +7075,49 @@ var author$project$View$viewSocket = F2(
 							' is currently ' + (socket.switchedOn ? 'ON' : 'OFF'))
 						])),
 					A2(
-					elm$html$Html$p,
+					elm$html$Html$ul,
 					_List_Nil,
 					_List_fromArray(
 						[
-							elm$html$Html$text(
-							'Power: ' + elm$core$String$fromFloat(socket.realPower))
-						])),
-					A2(
-					elm$html$Html$p,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Last seen: ' + lastSeen)
+							A2(
+							elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$text('Last seen: ' + lastSeen)
+								])),
+							A2(
+							elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$text(
+									'Power: ' + elm$core$String$fromFloat(socket.realPower))
+								])),
+							A2(
+							elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$text(
+									'Reactive Power: ' + elm$core$String$fromFloat(socket.reactivePower))
+								])),
+							A2(
+							elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$text(
+									'Frequency: ' + elm$core$String$fromFloat(socket.frequency))
+								])),
+							A2(
+							elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$text(
+									'Voltage: ' + elm$core$String$fromFloat(socket.voltage))
+								]))
 						])),
 					A2(
 					elm$html$Html$label,
@@ -7133,8 +7212,8 @@ var author$project$View$viewSocket = F2(
 	});
 var elm$core$List$sortBy = _List_sortBy;
 var elm$html$Html$h1 = _VirtualDom_node('h1');
+var elm$html$Html$p = _VirtualDom_node('p');
 var elm$html$Html$section = _VirtualDom_node('section');
-var elm$html$Html$ul = _VirtualDom_node('ul');
 var author$project$View$view = function (model) {
 	return {
 		body: _List_fromArray(

@@ -6,43 +6,37 @@
  */
 
 
+const extractValues = function(payload) {
+  const result = {};
+  payload.map(record => {
+    switch (record.paramname) {
+      case 'SWITCH_STATE': result.switchedOn = record.value !== 0; break;
+      case 'REAL_POWER': result.realPower = record.value; break;
+      case 'REACTIVE_POWER': result.reactivePower = record.value; break;
+      case 'FREQUENCY': result.frequency = record.value; break;
+      case 'VOLTAGE': result.voltage = record.value; break;
+    }
+  });
+  return result;
+};
+
 module.exports = {
   ping: async function (req, res) {
     const message = req.body;
-    const sensorId = message.header.sensorid;
-    const state = message.recs
-      .filter(rec => rec.paramname === 'SWITCH_STATE');
-    const power = message.recs
-      .filter(rec => rec.paramname === 'REAL_POWER');
+    const deviceId = message.header.sensorid.toString();
+    const records = extractValues(message.recs);
+    const updatedSocket = await Socket.updateOne({physicalSocket: deviceId})
+      .set(records);
 
-    if (state.length === 1) {
-      const switchedOn = state[0].value !== 0;
-      const realPower = power.length === 1 ? power[0].value : 0;
-      const now = Date.now();
-      const updatedSocket = await Socket.updateOne({physicalSocket: sensorId})
-        .set({
-          switchedOn,
-          realPower,
-          lastMessageReceived: now
-        });
-
-      if (!updatedSocket) {
-        sails.log('failed to find and update socket ' + sensorId);
-      } else {
-        sails.log('updated socket' + sensorId);
-        const payload = {
-          deviceId: sensorId,
-          isSwitchedOn: switchedOn,
-          realPower: realPower,
-          lastMessageReceived: now
-        };
-        sails.sockets.broadcast('updates', 'ping', payload, req);
-      }
-
+    if (!updatedSocket) {
+      sails.log('failed to find and update socket ' + deviceId);
     } else {
-      console.log(`switch ${sensorId} has no single SWITCH_STATE`);
+      sails.log('updated socket' + deviceId);
+      const payload = { deviceId, records, lastMessageReceived: Date.now() };
+      sails.log('sending', payload);
+      sails.sockets.broadcast('updates', 'ping', payload, req);
     }
-    return res.json(message);
+    return res.json(records);
   },
 
   subscribe: async function (req, res) {
