@@ -6,10 +6,10 @@
 # Any device that has a switch, it toggles it every 2 seconds.
 # Any device that offers a power reading, it displays it.
 
-#import energenie
+import energenie
 import time
 import json
-#import requests
+import requests
 import argparse
 
 
