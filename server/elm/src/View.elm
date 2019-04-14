@@ -261,7 +261,7 @@ intervalToString milliseconds =
                    )
     in
     if timeAgo /= "" then
-        timeAgo
+        timeAgo ++ " ago"
 
     else
         "just now"

@@ -6,10 +6,11 @@
 # Any device that has a switch, it toggles it every 2 seconds.
 # Any device that offers a power reading, it displays it.
 
-import energenie
+#import energenie
 import time
 import json
-import requests
+#import requests
+import argparse
 
 
 APP_DELAY    = 2
@@ -26,18 +27,24 @@ def energy_monitor_loop():
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(description='Monitors energenie switches.')
+    parser.add_argument('url', metavar='U', nargs=1,
+                        help='URL of the server to send messages to')
+    args = parser.parse_args()
+
+    url = args.url[0]
+
     print("Starting energy monitor example")
 
     energenie.init()
 
     # provide a default incoming message handler, useful for logging every message
     def incoming(address, message):
-#        print("\nIncoming from %s" % str(address))
 	payload = json.dumps(message.pydict)
         try:
             print("pinging")
-            print(payload)
-            r = requests.post('http://192.168.0.5:1337/ping', data=payload)
+#            print(payload)
+            r = requests.post(url, data=payload)
             if r.status_code != 200:
                 print("Error! Server responded with an error: "+str(r.status_code))
 

@@ -7032,7 +7032,7 @@ var author$project$View$intervalToString = function (milliseconds) {
 			_Utils_ap(
 				minutesAgo ? (elm$core$String$fromInt(minutesAgo) + ' minutes  ') : '',
 				secondsAgo ? (elm$core$String$fromInt(secondsAgo) + ' seconds') : '')));
-	return (timeAgo !== '') ? timeAgo : 'just now';
+	return (timeAgo !== '') ? (timeAgo + ' ago') : 'just now';
 };
 var elm$html$Html$details = _VirtualDom_node('details');
 var elm$html$Html$li = _VirtualDom_node('li');
