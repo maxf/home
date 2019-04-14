@@ -7,7 +7,7 @@
 
 
 const extractValues = function(payload) {
-  const result = {};
+  const result = { lastMessageReceived: Date.now() };
   payload.map(record => {
     switch (record.paramname) {
       case 'SWITCH_STATE': result.switchedOn = record.value !== 0; break;
@@ -32,7 +32,7 @@ module.exports = {
       sails.log('failed to find and update socket ' + deviceId);
     } else {
       sails.log('updated socket' + deviceId);
-      const payload = { deviceId, records, lastMessageReceived: Date.now() };
+      const payload = { deviceId, records };
       sails.log('sending', payload);
       sails.sockets.broadcast('updates', 'ping', payload, req);
     }
