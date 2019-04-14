@@ -272,7 +272,7 @@ update msg model =
                                 if x.physicalId == message.deviceId then
                                     { x
                                         | switchedOn = message.records.switchedOn
-                                        , lastMessageReceived = Just message.lastMessageReceived
+                                        , lastMessageReceived = Just message.records.updatedAt
                                         , realPower = message.records.realPower
                                         , reactivePower = message.records.reactivePower
                                         , frequency = message.records.frequency

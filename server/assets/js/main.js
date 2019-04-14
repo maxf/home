@@ -6031,16 +6031,11 @@ var author$project$Main$pushMessage = _Platform_incomingPort(
 		function (records) {
 			return A2(
 				elm$json$Json$Decode$andThen,
-				function (lastMessageReceived) {
-					return A2(
-						elm$json$Json$Decode$andThen,
-						function (deviceId) {
-							return elm$json$Json$Decode$succeed(
-								{deviceId: deviceId, lastMessageReceived: lastMessageReceived, records: records});
-						},
-						A2(elm$json$Json$Decode$field, 'deviceId', elm$json$Json$Decode$string));
+				function (deviceId) {
+					return elm$json$Json$Decode$succeed(
+						{deviceId: deviceId, records: records});
 				},
-				A2(elm$json$Json$Decode$field, 'lastMessageReceived', elm$json$Json$Decode$int));
+				A2(elm$json$Json$Decode$field, 'deviceId', elm$json$Json$Decode$string));
 		},
 		A2(
 			elm$json$Json$Decode$field,
@@ -6050,26 +6045,31 @@ var author$project$Main$pushMessage = _Platform_incomingPort(
 				function (voltage) {
 					return A2(
 						elm$json$Json$Decode$andThen,
-						function (switchedOn) {
+						function (updatedAt) {
 							return A2(
 								elm$json$Json$Decode$andThen,
-								function (realPower) {
+								function (switchedOn) {
 									return A2(
 										elm$json$Json$Decode$andThen,
-										function (reactivePower) {
+										function (realPower) {
 											return A2(
 												elm$json$Json$Decode$andThen,
-												function (frequency) {
-													return elm$json$Json$Decode$succeed(
-														{frequency: frequency, reactivePower: reactivePower, realPower: realPower, switchedOn: switchedOn, voltage: voltage});
+												function (reactivePower) {
+													return A2(
+														elm$json$Json$Decode$andThen,
+														function (frequency) {
+															return elm$json$Json$Decode$succeed(
+																{frequency: frequency, reactivePower: reactivePower, realPower: realPower, switchedOn: switchedOn, updatedAt: updatedAt, voltage: voltage});
+														},
+														A2(elm$json$Json$Decode$field, 'frequency', elm$json$Json$Decode$float));
 												},
-												A2(elm$json$Json$Decode$field, 'frequency', elm$json$Json$Decode$float));
+												A2(elm$json$Json$Decode$field, 'reactivePower', elm$json$Json$Decode$float));
 										},
-										A2(elm$json$Json$Decode$field, 'reactivePower', elm$json$Json$Decode$float));
+										A2(elm$json$Json$Decode$field, 'realPower', elm$json$Json$Decode$float));
 								},
-								A2(elm$json$Json$Decode$field, 'realPower', elm$json$Json$Decode$float));
+								A2(elm$json$Json$Decode$field, 'switchedOn', elm$json$Json$Decode$bool));
 						},
-						A2(elm$json$Json$Decode$field, 'switchedOn', elm$json$Json$Decode$bool));
+						A2(elm$json$Json$Decode$field, 'updatedAt', elm$json$Json$Decode$int));
 				},
 				A2(elm$json$Json$Decode$field, 'voltage', elm$json$Json$Decode$float)))));
 var author$project$Model$PushReceived = function (a) {
@@ -6671,7 +6671,7 @@ var author$project$Main$update = F2(
 							x,
 							{
 								frequency: message.records.frequency,
-								lastMessageReceived: elm$core$Maybe$Just(message.lastMessageReceived),
+								lastMessageReceived: elm$core$Maybe$Just(message.records.updatedAt),
 								reactivePower: message.records.reactivePower,
 								realPower: message.records.realPower,
 								switchedOn: message.records.switchedOn,
@@ -7006,12 +7006,9 @@ var author$project$Model$SwitchOff = function (a) {
 var author$project$Model$SwitchOn = function (a) {
 	return {$: 'SwitchOn', a: a};
 };
-var elm$core$Debug$log = _Debug_log;
 var author$project$View$durationToOpacity = function (intervalInMs) {
 	var threshold = 20000;
-	return (_Utils_cmp(
-		A2(elm$core$Debug$log, '>>', intervalInMs),
-		threshold) > 0) ? 0 : ((threshold - intervalInMs) / threshold);
+	return (_Utils_cmp(intervalInMs, threshold) > 0) ? 0 : ((threshold - intervalInMs) / threshold);
 };
 var elm$core$String$fromFloat = _String_fromNumber;
 var author$project$View$durationToSaturation = function (t) {
@@ -7087,8 +7084,7 @@ var author$project$View$viewSocket = F2(
 							A2(
 							elm$html$Html$Attributes$style,
 							'opacity',
-							elm$core$String$fromFloat(
-								A2(elm$core$Debug$log, '>', opacity))),
+							elm$core$String$fromFloat(opacity)),
 							elm$html$Html$Attributes$title(lastSeen)
 						]),
 					_List_fromArray(

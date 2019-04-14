@@ -60,7 +60,7 @@ durationToOpacity intervalInMs =
         threshold =
             20000
     in
-    if (Debug.log ">>" intervalInMs) > threshold then
+    if intervalInMs > threshold then
         0
 
     else
@@ -101,7 +101,7 @@ viewSocket time socket =
                 , span
                     [ style "color" "green"
                     , style "font-size" "2em"
-                    , style "opacity" (String.fromFloat (opacity |> Debug.log ">" ))
+                    , style "opacity" (String.fromFloat opacity)
                     , title lastSeen
                     ]
                     [ text

@@ -25,13 +25,13 @@ type Msg
 
 type alias PushMessage =
     { deviceId : String
-    , lastMessageReceived : Int
     , records :
         { switchedOn : Bool
         , realPower : Float
         , reactivePower : Float
         , frequency : Float
         , voltage : Float
+        , updatedAt : Int
         }
     }
 
