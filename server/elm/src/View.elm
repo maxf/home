@@ -53,6 +53,20 @@ durationToSaturation t =
         (100 * (1 - tf / (1000 * secs))) |> String.fromFloat
 
 
+durationToOpacity : Int -> Float
+durationToOpacity intervalInMs =
+    let
+        -- milliseconds above which opacity is 0
+        threshold =
+            20000
+    in
+    if (Debug.log ">>" intervalInMs) > threshold then
+        0
+
+    else
+        toFloat (threshold - intervalInMs) / threshold
+
+
 viewSocket : Int -> Socket -> Html Msg
 viewSocket time socket =
     let
@@ -62,7 +76,7 @@ viewSocket time socket =
                     "never"
 
                 Just secs ->
-                    secs |> toUtcString
+                    time - secs |> intervalToString
 
         fadedColor =
             case socket.lastMessageReceived of
@@ -71,44 +85,62 @@ viewSocket time socket =
 
                 Just secs ->
                     "hsl(120," ++ durationToSaturation (time - secs) ++ "%,50%)"
-    in
-    li [ class "socket", style "background" fadedColor ]
-        [ h2 [] [ text ("Socket " ++ (socket.id |> String.fromInt)) ]
-        , h3 []
-            [ text
-                (" is currently "
-                    ++ (if socket.switchedOn then
-                            "ON"
 
-                        else
-                            "OFF"
-                       )
-                )
-            ]
-        , ul []
-            [ li [] [ text ("Last seen: " ++ lastSeen) ]
-            , li [] [ text ("Power: " ++ (socket.realPower |> String.fromFloat)) ]
-            , li [] [ text ("Reactive Power: " ++ (socket.reactivePower |> String.fromFloat)) ]
-            , li [] [ text ("Frequency: " ++ (socket.frequency |> String.fromFloat)) ]
-            , li [] [ text ("Voltage: " ++ (socket.voltage |> String.fromFloat)) ]
-            ]
-        , label []
-            [ text "Physical socket: "
-            , input [ onInput (SocketPhysicalIdChanged socket.id), value socket.physicalId ] []
-            ]
-        , br [] []
-        , label []
-            [ text "Description: "
-            , input [ onInput (SocketDescriptionChanged socket.id), value socket.description ] []
-            ]
-        , br [] []
-        , button [ onClick (SwitchOn socket) ] [ text "Switch on" ]
-        , button [ onClick (SwitchOff socket) ] [ text "Switch off" ]
-        , br [] []
-        , div [ class "buttons" ]
-            [ button [ onClick (ChangeSocket socket) ] [ text "Change" ]
-            , text " - "
-            , button [ onClick (DeleteSocket socket.id) ] [ text "Delete" ]
+        opacity =
+            case socket.lastMessageReceived of
+                Nothing ->
+                    1.0
+
+                Just secs ->
+                    durationToOpacity (time - secs)
+
+        status =
+            span []
+                [ text socket.description
+                , text " - "
+                , span
+                    [ style "color" "green"
+                    , style "font-size" "2em"
+                    , style "opacity" (String.fromFloat (opacity |> Debug.log ">" ))
+                    , title lastSeen
+                    ]
+                    [ text
+                        (if socket.switchedOn then
+                            "💡"
+
+                         else
+                            "❌"
+                        )
+                    ]
+                , text " - "
+                , button [ onClick (SwitchOn socket) ] [ text "ON" ]
+                , text " - "
+                , button [ onClick (SwitchOff socket) ] [ text "OFF" ]
+                ]
+    in
+    li [ class "socket" ]
+        [ details []
+            [ summary [] [ status ]
+            , ul []
+                [ li [] [ text ("Last seen: " ++ lastSeen) ]
+                , li [] [ text ("Power: " ++ (socket.realPower |> String.fromFloat)) ]
+                , li [] [ text ("Reactive Power: " ++ (socket.reactivePower |> String.fromFloat)) ]
+                , li [] [ text ("Frequency: " ++ (socket.frequency |> String.fromFloat)) ]
+                , li [] [ text ("Voltage: " ++ (socket.voltage |> String.fromFloat)) ]
+                , li []
+                    [ text "Description: "
+                    , input [ onInput (SocketDescriptionChanged socket.id), value socket.description ] []
+                    ]
+                , li []
+                    [ text "Physical socket: "
+                    , input [ onInput (SocketPhysicalIdChanged socket.id), value socket.physicalId ] []
+                    ]
+                ]
+            , div [ class "buttons" ]
+                [ button [ onClick (ChangeSocket socket) ] [ text "Change" ]
+                , text " - "
+                , button [ onClick (DeleteSocket socket.id) ] [ text "Delete" ]
+                ]
             ]
         ]
 
@@ -182,3 +214,54 @@ toEnglishMonth month =
 
         Dec ->
             "Dec"
+
+
+intervalToString : Int -> String
+intervalToString milliseconds =
+    let
+        seconds =
+            milliseconds // 1000
+
+        daysAgo =
+            seconds // 3600 // 24
+
+        hoursAgo =
+            (seconds - daysAgo * 3600 * 24) // 3600
+
+        minutesAgo =
+            (seconds - (daysAgo * 3600 * 24) - (hoursAgo * 3600)) // 60
+
+        secondsAgo =
+            seconds - (daysAgo * 3600 * 24) - (hoursAgo * 3600) - (minutesAgo * 60)
+
+        timeAgo =
+            (if daysAgo /= 0 then
+                String.fromInt daysAgo ++ " days  "
+
+             else
+                ""
+            )
+                ++ (if hoursAgo /= 0 then
+                        String.fromInt hoursAgo ++ " hours  "
+
+                    else
+                        ""
+                   )
+                ++ (if minutesAgo /= 0 then
+                        String.fromInt minutesAgo ++ " minutes  "
+
+                    else
+                        ""
+                   )
+                ++ (if secondsAgo /= 0 then
+                        String.fromInt secondsAgo ++ " seconds"
+
+                    else
+                        ""
+                   )
+    in
+    if timeAgo /= "" then
+        timeAgo
+
+    else
+        "just now"

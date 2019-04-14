@@ -7006,16 +7006,37 @@ var author$project$Model$SwitchOff = function (a) {
 var author$project$Model$SwitchOn = function (a) {
 	return {$: 'SwitchOn', a: a};
 };
+var elm$core$Debug$log = _Debug_log;
+var author$project$View$durationToOpacity = function (intervalInMs) {
+	var threshold = 20000;
+	return (_Utils_cmp(
+		A2(elm$core$Debug$log, '>>', intervalInMs),
+		threshold) > 0) ? 0 : ((threshold - intervalInMs) / threshold);
+};
 var elm$core$String$fromFloat = _String_fromNumber;
 var author$project$View$durationToSaturation = function (t) {
 	var tf = t;
 	var secs = 20.0;
 	return (_Utils_cmp(tf, 1000 * secs) > 0) ? '0' : elm$core$String$fromFloat(100 * (1 - (tf / (1000 * secs))));
 };
-var elm$html$Html$br = _VirtualDom_node('br');
-var elm$html$Html$h2 = _VirtualDom_node('h2');
-var elm$html$Html$h3 = _VirtualDom_node('h3');
+var author$project$View$intervalToString = function (milliseconds) {
+	var seconds = (milliseconds / 1000) | 0;
+	var daysAgo = (((seconds / 3600) | 0) / 24) | 0;
+	var hoursAgo = ((seconds - ((daysAgo * 3600) * 24)) / 3600) | 0;
+	var minutesAgo = (((seconds - ((daysAgo * 3600) * 24)) - (hoursAgo * 3600)) / 60) | 0;
+	var secondsAgo = ((seconds - ((daysAgo * 3600) * 24)) - (hoursAgo * 3600)) - (minutesAgo * 60);
+	var timeAgo = _Utils_ap(
+		daysAgo ? (elm$core$String$fromInt(daysAgo) + ' days  ') : '',
+		_Utils_ap(
+			hoursAgo ? (elm$core$String$fromInt(hoursAgo) + ' hours  ') : '',
+			_Utils_ap(
+				minutesAgo ? (elm$core$String$fromInt(minutesAgo) + ' minutes  ') : '',
+				secondsAgo ? (elm$core$String$fromInt(secondsAgo) + ' seconds') : '')));
+	return (timeAgo !== '') ? timeAgo : 'just now';
+};
+var elm$html$Html$details = _VirtualDom_node('details');
 var elm$html$Html$li = _VirtualDom_node('li');
+var elm$html$Html$summary = _VirtualDom_node('summary');
 var elm$html$Html$ul = _VirtualDom_node('ul');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
@@ -7028,18 +7049,78 @@ var elm$html$Html$Attributes$stringProperty = F2(
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var elm$html$Html$Attributes$title = elm$html$Html$Attributes$stringProperty('title');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var author$project$View$viewSocket = F2(
 	function (time, socket) {
+		var opacity = function () {
+			var _n2 = socket.lastMessageReceived;
+			if (_n2.$ === 'Nothing') {
+				return 1.0;
+			} else {
+				var secs = _n2.a;
+				return author$project$View$durationToOpacity(time - secs);
+			}
+		}();
 		var lastSeen = function () {
 			var _n1 = socket.lastMessageReceived;
 			if (_n1.$ === 'Nothing') {
 				return 'never';
 			} else {
 				var secs = _n1.a;
-				return author$project$View$toUtcString(secs);
+				return author$project$View$intervalToString(time - secs);
 			}
 		}();
+		var status = A2(
+			elm$html$Html$span,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text(socket.description),
+					elm$html$Html$text(' - '),
+					A2(
+					elm$html$Html$span,
+					_List_fromArray(
+						[
+							A2(elm$html$Html$Attributes$style, 'color', 'green'),
+							A2(elm$html$Html$Attributes$style, 'font-size', '2em'),
+							A2(
+							elm$html$Html$Attributes$style,
+							'opacity',
+							elm$core$String$fromFloat(
+								A2(elm$core$Debug$log, '>', opacity))),
+							elm$html$Html$Attributes$title(lastSeen)
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(
+							socket.switchedOn ? '💡' : '❌')
+						])),
+					elm$html$Html$text(' - '),
+					A2(
+					elm$html$Html$button,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onClick(
+							author$project$Model$SwitchOn(socket))
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('ON')
+						])),
+					elm$html$Html$text(' - '),
+					A2(
+					elm$html$Html$button,
+					_List_fromArray(
+						[
+							elm$html$Html$Events$onClick(
+							author$project$Model$SwitchOff(socket))
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('OFF')
+						]))
+				]));
 		var fadedColor = function () {
 			var _n0 = socket.lastMessageReceived;
 			if (_n0.$ === 'Nothing') {
@@ -7053,159 +7134,128 @@ var author$project$View$viewSocket = F2(
 			elm$html$Html$li,
 			_List_fromArray(
 				[
-					elm$html$Html$Attributes$class('socket'),
-					A2(elm$html$Html$Attributes$style, 'background', fadedColor)
+					elm$html$Html$Attributes$class('socket')
 				]),
 			_List_fromArray(
 				[
 					A2(
-					elm$html$Html$h2,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text(
-							'Socket ' + elm$core$String$fromInt(socket.id))
-						])),
-					A2(
-					elm$html$Html$h3,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text(
-							' is currently ' + (socket.switchedOn ? 'ON' : 'OFF'))
-						])),
-					A2(
-					elm$html$Html$ul,
+					elm$html$Html$details,
 					_List_Nil,
 					_List_fromArray(
 						[
 							A2(
-							elm$html$Html$li,
+							elm$html$Html$summary,
+							_List_Nil,
+							_List_fromArray(
+								[status])),
+							A2(
+							elm$html$Html$ul,
 							_List_Nil,
 							_List_fromArray(
 								[
-									elm$html$Html$text('Last seen: ' + lastSeen)
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text('Last seen: ' + lastSeen)
+										])),
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text(
+											'Power: ' + elm$core$String$fromFloat(socket.realPower))
+										])),
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text(
+											'Reactive Power: ' + elm$core$String$fromFloat(socket.reactivePower))
+										])),
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text(
+											'Frequency: ' + elm$core$String$fromFloat(socket.frequency))
+										])),
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text(
+											'Voltage: ' + elm$core$String$fromFloat(socket.voltage))
+										])),
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text('Description: '),
+											A2(
+											elm$html$Html$input,
+											_List_fromArray(
+												[
+													elm$html$Html$Events$onInput(
+													author$project$Model$SocketDescriptionChanged(socket.id)),
+													elm$html$Html$Attributes$value(socket.description)
+												]),
+											_List_Nil)
+										])),
+									A2(
+									elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text('Physical socket: '),
+											A2(
+											elm$html$Html$input,
+											_List_fromArray(
+												[
+													elm$html$Html$Events$onInput(
+													author$project$Model$SocketPhysicalIdChanged(socket.id)),
+													elm$html$Html$Attributes$value(socket.physicalId)
+												]),
+											_List_Nil)
+										]))
 								])),
 							A2(
-							elm$html$Html$li,
-							_List_Nil,
+							elm$html$Html$div,
 							_List_fromArray(
 								[
-									elm$html$Html$text(
-									'Power: ' + elm$core$String$fromFloat(socket.realPower))
-								])),
-							A2(
-							elm$html$Html$li,
-							_List_Nil,
-							_List_fromArray(
-								[
-									elm$html$Html$text(
-									'Reactive Power: ' + elm$core$String$fromFloat(socket.reactivePower))
-								])),
-							A2(
-							elm$html$Html$li,
-							_List_Nil,
-							_List_fromArray(
-								[
-									elm$html$Html$text(
-									'Frequency: ' + elm$core$String$fromFloat(socket.frequency))
-								])),
-							A2(
-							elm$html$Html$li,
-							_List_Nil,
-							_List_fromArray(
-								[
-									elm$html$Html$text(
-									'Voltage: ' + elm$core$String$fromFloat(socket.voltage))
-								]))
-						])),
-					A2(
-					elm$html$Html$label,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Physical socket: '),
-							A2(
-							elm$html$Html$input,
-							_List_fromArray(
-								[
-									elm$html$Html$Events$onInput(
-									author$project$Model$SocketPhysicalIdChanged(socket.id)),
-									elm$html$Html$Attributes$value(socket.physicalId)
-								]),
-							_List_Nil)
-						])),
-					A2(elm$html$Html$br, _List_Nil, _List_Nil),
-					A2(
-					elm$html$Html$label,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Description: '),
-							A2(
-							elm$html$Html$input,
-							_List_fromArray(
-								[
-									elm$html$Html$Events$onInput(
-									author$project$Model$SocketDescriptionChanged(socket.id)),
-									elm$html$Html$Attributes$value(socket.description)
-								]),
-							_List_Nil)
-						])),
-					A2(elm$html$Html$br, _List_Nil, _List_Nil),
-					A2(
-					elm$html$Html$button,
-					_List_fromArray(
-						[
-							elm$html$Html$Events$onClick(
-							author$project$Model$SwitchOn(socket))
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('Switch on')
-						])),
-					A2(
-					elm$html$Html$button,
-					_List_fromArray(
-						[
-							elm$html$Html$Events$onClick(
-							author$project$Model$SwitchOff(socket))
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('Switch off')
-						])),
-					A2(elm$html$Html$br, _List_Nil, _List_Nil),
-					A2(
-					elm$html$Html$div,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('buttons')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							elm$html$Html$button,
-							_List_fromArray(
-								[
-									elm$html$Html$Events$onClick(
-									author$project$Model$ChangeSocket(socket))
+									elm$html$Html$Attributes$class('buttons')
 								]),
 							_List_fromArray(
 								[
-									elm$html$Html$text('Change')
-								])),
-							elm$html$Html$text(' - '),
-							A2(
-							elm$html$Html$button,
-							_List_fromArray(
-								[
-									elm$html$Html$Events$onClick(
-									author$project$Model$DeleteSocket(socket.id))
-								]),
-							_List_fromArray(
-								[
-									elm$html$Html$text('Delete')
+									A2(
+									elm$html$Html$button,
+									_List_fromArray(
+										[
+											elm$html$Html$Events$onClick(
+											author$project$Model$ChangeSocket(socket))
+										]),
+									_List_fromArray(
+										[
+											elm$html$Html$text('Change')
+										])),
+									elm$html$Html$text(' - '),
+									A2(
+									elm$html$Html$button,
+									_List_fromArray(
+										[
+											elm$html$Html$Events$onClick(
+											author$project$Model$DeleteSocket(socket.id))
+										]),
+									_List_fromArray(
+										[
+											elm$html$Html$text('Delete')
+										]))
 								]))
 						]))
 				]));
