@@ -28,8 +28,9 @@ view model =
                         (viewSocket model.lastTick)
                         (List.sortBy .id sockets)
                     )
-        , section []
-            [ h1 [] [ text "Add a switch" ]
+        , hr [] []
+        , details []
+            [ summary [] [ text "Add a switch" ]
             , viewAddSwitch
             ]
         ]
@@ -95,12 +96,11 @@ viewSocket time socket =
                     durationToOpacity (time - secs)
 
         status =
-            span []
+            span [ class "status" ]
                 [ text socket.description
                 , text " - "
                 , span
-                    [ style "color" "green"
-                    , style "font-size" "2em"
+                    [ class "switch"
                     , style "opacity" (String.fromFloat opacity)
                     , title lastSeen
                     ]
@@ -119,8 +119,9 @@ viewSocket time socket =
                 ]
     in
     li [ class "socket" ]
-        [ details []
-            [ summary [] [ status ]
+        [ status
+        , details []
+            [ summary [] [ text "details" ]
             , ul []
                 [ li [] [ text ("Last seen: " ++ lastSeen) ]
                 , li [] [ text ("Power: " ++ (socket.realPower |> String.fromFloat)) ]

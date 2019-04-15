@@ -7070,7 +7070,10 @@ var author$project$View$viewSocket = F2(
 		}();
 		var status = A2(
 			elm$html$Html$span,
-			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$class('status')
+				]),
 			_List_fromArray(
 				[
 					elm$html$Html$text(socket.description),
@@ -7079,8 +7082,7 @@ var author$project$View$viewSocket = F2(
 					elm$html$Html$span,
 					_List_fromArray(
 						[
-							A2(elm$html$Html$Attributes$style, 'color', 'green'),
-							A2(elm$html$Html$Attributes$style, 'font-size', '2em'),
+							elm$html$Html$Attributes$class('switch'),
 							A2(
 							elm$html$Html$Attributes$style,
 							'opacity',
@@ -7134,6 +7136,7 @@ var author$project$View$viewSocket = F2(
 				]),
 			_List_fromArray(
 				[
+					status,
 					A2(
 					elm$html$Html$details,
 					_List_Nil,
@@ -7143,7 +7146,9 @@ var author$project$View$viewSocket = F2(
 							elm$html$Html$summary,
 							_List_Nil,
 							_List_fromArray(
-								[status])),
+								[
+									elm$html$Html$text('details')
+								])),
 							A2(
 							elm$html$Html$ul,
 							_List_Nil,
@@ -7258,8 +7263,8 @@ var author$project$View$viewSocket = F2(
 	});
 var elm$core$List$sortBy = _List_sortBy;
 var elm$html$Html$h1 = _VirtualDom_node('h1');
+var elm$html$Html$hr = _VirtualDom_node('hr');
 var elm$html$Html$p = _VirtualDom_node('p');
-var elm$html$Html$section = _VirtualDom_node('section');
 var author$project$View$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -7317,13 +7322,14 @@ var author$project$View$view = function (model) {
 									sockets)));
 				}
 			}(),
+				A2(elm$html$Html$hr, _List_Nil, _List_Nil),
 				A2(
-				elm$html$Html$section,
+				elm$html$Html$details,
 				_List_Nil,
 				_List_fromArray(
 					[
 						A2(
-						elm$html$Html$h1,
+						elm$html$Html$summary,
 						_List_Nil,
 						_List_fromArray(
 							[
