@@ -1,6 +1,7 @@
 npm-debug.log
 .sass-cache
 server/media
+server/.env
 .vagrant
 __pycache__
 *.pyc

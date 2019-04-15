@@ -16,8 +16,10 @@ const request = require('request-promise-native');
 
 
 const updateSwitch = async function(id, onOrOff) {
-  const apiUrl = `http://192.168.0.3:5000/set_switch/${id}/${onOrOff}`;
+//  const apiUrl = `http://192.168.0.3:5000/set_switch/${id}/${onOrOff}`;
+  const apiUrl = `${process.env.SWITCH_API}/set_switch/${id}/${onOrOff}`;
   sails.log(`sending "${onOrOff}" to switch ${id}`);
+  sails.log(apiUrl);
   try {
     await request.get(apiUrl);
   } catch (e) {
