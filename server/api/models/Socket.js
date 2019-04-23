@@ -28,6 +28,11 @@ module.exports = {
       required: false,
       defaultsTo: false
     },
+    requestedSwitchedOn: {
+      type: 'boolean', // True: the socket is expected to be on
+      required: false,
+      defaultsTo: false
+    },
     realPower: {
       type: 'number',
       defaultsTo: 0,

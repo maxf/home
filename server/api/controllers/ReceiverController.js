@@ -27,15 +27,21 @@ module.exports = {
     const records = extractValues(message.recs);
     const updatedSocket = await Socket.updateOne({physicalSocket: deviceId})
       .set(records);
-
+    sails.log(`message from ${deviceId}`);
     if (!updatedSocket) {
       sails.log('failed to find and update socket ' + deviceId);
     } else {
-      sails.log('updated socket' + deviceId);
       const payload = { deviceId, records };
-      sails.log('sending', payload);
       sails.sockets.broadcast('updates', 'ping', payload, req);
+
+/*
+      if (updatedSocket.requestedSwitchedOn !== updatedSocket.switchedOn) {
+        console.log(`retrying socket ${updatedSocket.description}`, updatedSocket.requestedSwitchedOn, updatedSocket.switchedOn);
+        await sails.helpers.setSwitch(updatedSocket.physicalSocket, updatedSocket.requestedSwitchedOn ? 'on' : 'off');
+      }
+*/
     }
+
     return res.json(records);
   },
 

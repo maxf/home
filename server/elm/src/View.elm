@@ -112,10 +112,20 @@ viewSocket time socket =
                             "❌"
                         )
                     ]
+                , span
+                    [ class "switch" ]
+                    [ text
+                        (if socket.requestedSwitchedOn then
+                            "💡"
+
+                         else
+                            "❌"
+                        )
+                    ]
                 , text " - "
-                , button [ onClick (SwitchOn socket) ] [ text "ON" ]
+                , button [ onClick (Switch True socket) ] [ text "ON" ]
                 , text " - "
-                , button [ onClick (SwitchOff socket) ] [ text "OFF" ]
+                , button [ onClick (Switch False socket) ] [ text "OFF" ]
                 ]
     in
     li [ class "socket" ]

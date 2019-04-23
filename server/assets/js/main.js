@@ -5035,16 +5035,18 @@ var author$project$Model$Socket = function (id) {
 		return function (physicalId) {
 			return function (timerMode) {
 				return function (switchedOn) {
-					return function (realPower) {
-						return function (reactivePower) {
-							return function (frequency) {
-								return function (voltage) {
-									return function (startTime) {
-										return function (stopTime) {
-											return function (random) {
-												return function (randomBreaks) {
-													return function (lastMessageReceived) {
-														return {description: description, frequency: frequency, id: id, lastMessageReceived: lastMessageReceived, physicalId: physicalId, random: random, randomBreaks: randomBreaks, reactivePower: reactivePower, realPower: realPower, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode, voltage: voltage};
+					return function (requestedSwitchedOn) {
+						return function (realPower) {
+							return function (reactivePower) {
+								return function (frequency) {
+									return function (voltage) {
+										return function (startTime) {
+											return function (stopTime) {
+												return function (random) {
+													return function (randomBreaks) {
+														return function (lastMessageReceived) {
+															return {description: description, frequency: frequency, id: id, lastMessageReceived: lastMessageReceived, physicalId: physicalId, random: random, randomBreaks: randomBreaks, reactivePower: reactivePower, realPower: realPower, requestedSwitchedOn: requestedSwitchedOn, startTime: startTime, stopTime: stopTime, switchedOn: switchedOn, timerMode: timerMode, voltage: voltage};
+														};
 													};
 												};
 											};
@@ -5101,25 +5103,29 @@ var author$project$Main$socketDecoder = A3(
 									elm$json$Json$Decode$float,
 									A3(
 										NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-										'switchedOn',
+										'requestedSwitchedOn',
 										elm$json$Json$Decode$bool,
 										A3(
 											NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-											'timerMode',
+											'switchedOn',
 											elm$json$Json$Decode$bool,
 											A3(
 												NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-												'physicalSocket',
-												elm$json$Json$Decode$string,
+												'timerMode',
+												elm$json$Json$Decode$bool,
 												A3(
 													NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-													'description',
+													'physicalSocket',
 													elm$json$Json$Decode$string,
 													A3(
 														NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-														'id',
-														elm$json$Json$Decode$int,
-														elm$json$Json$Decode$succeed(author$project$Model$Socket)))))))))))))));
+														'description',
+														elm$json$Json$Decode$string,
+														A3(
+															NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+															'id',
+															elm$json$Json$Decode$int,
+															elm$json$Json$Decode$succeed(author$project$Model$Socket))))))))))))))));
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Main$socketsDecoder = elm$json$Json$Decode$list(author$project$Main$socketDecoder);
 var author$project$Model$SocketsReceived = function (a) {
@@ -6438,6 +6444,15 @@ var author$project$Main$changeSocket = function (socket) {
 			url: '/Socket/' + elm$core$String$fromInt(socket.id)
 		});
 };
+var author$project$Main$modifySocketRequiredSwitchedOn = F3(
+	function (sockets, socket, value) {
+		var updateSocket = function (s) {
+			return _Utils_eq(s, socket) ? _Utils_update(
+				s,
+				{requestedSwitchedOn: value}) : s;
+		};
+		return A2(elm$core$List$map, updateSocket, sockets);
+	});
 var author$project$Model$SocketDeleted = function (a) {
 	return {$: 'SocketDeleted', a: a};
 };
@@ -6625,16 +6640,23 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
-			case 'SwitchOn':
-				var socket = msg.a;
-				return _Utils_Tuple2(
-					model,
-					A2(author$project$Main$switchSocket, true, socket));
-			case 'SwitchOff':
-				var socket = msg.a;
-				return _Utils_Tuple2(
-					model,
-					A2(author$project$Main$switchSocket, false, socket));
+			case 'Switch':
+				var switchedOn = msg.a;
+				var socket = msg.b;
+				var _n6 = model.sockets;
+				if (_n6.$ === 'Sockets') {
+					var sockets = _n6.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								sockets: author$project$Model$Sockets(
+									A3(author$project$Main$modifySocketRequiredSwitchedOn, sockets, socket, switchedOn))
+							}),
+						A2(author$project$Main$switchSocket, switchedOn, socket));
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
 			case 'SocketSwitched':
 				if (msg.a.$ === 'Err') {
 					return _Utils_Tuple2(
@@ -6663,9 +6685,9 @@ var author$project$Main$update = F2(
 				}
 			case 'PushReceived':
 				var message = msg.a;
-				var _n6 = model.sockets;
-				if (_n6.$ === 'Sockets') {
-					var sockets = _n6.a;
+				var _n7 = model.sockets;
+				if (_n7.$ === 'Sockets') {
+					var sockets = _n7.a;
 					var updateSwitch = function (x) {
 						return _Utils_eq(x.physicalId, message.deviceId) ? _Utils_update(
 							x,
@@ -7000,12 +7022,10 @@ var author$project$Model$SocketPhysicalIdChanged = F2(
 	function (a, b) {
 		return {$: 'SocketPhysicalIdChanged', a: a, b: b};
 	});
-var author$project$Model$SwitchOff = function (a) {
-	return {$: 'SwitchOff', a: a};
-};
-var author$project$Model$SwitchOn = function (a) {
-	return {$: 'SwitchOn', a: a};
-};
+var author$project$Model$Switch = F2(
+	function (a, b) {
+		return {$: 'Switch', a: a, b: b};
+	});
 var author$project$View$durationToOpacity = function (intervalInMs) {
 	var threshold = 20000;
 	return (_Utils_cmp(intervalInMs, threshold) > 0) ? 0 : ((threshold - intervalInMs) / threshold);
@@ -7094,13 +7114,24 @@ var author$project$View$viewSocket = F2(
 							elm$html$Html$text(
 							socket.switchedOn ? '💡' : '❌')
 						])),
+					A2(
+					elm$html$Html$span,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('switch')
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text(
+							socket.requestedSwitchedOn ? '💡' : '❌')
+						])),
 					elm$html$Html$text(' - '),
 					A2(
 					elm$html$Html$button,
 					_List_fromArray(
 						[
 							elm$html$Html$Events$onClick(
-							author$project$Model$SwitchOn(socket))
+							A2(author$project$Model$Switch, true, socket))
 						]),
 					_List_fromArray(
 						[
@@ -7112,7 +7143,7 @@ var author$project$View$viewSocket = F2(
 					_List_fromArray(
 						[
 							elm$html$Html$Events$onClick(
-							author$project$Model$SwitchOff(socket))
+							A2(author$project$Model$Switch, false, socket))
 						]),
 					_List_fromArray(
 						[

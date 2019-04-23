@@ -14,8 +14,7 @@ type Msg
     | NewSocketAdded (Result Http.Error Socket)
     | SocketDescriptionChanged Int String
     | SocketPhysicalIdChanged Int String
-    | SwitchOn Socket
-    | SwitchOff Socket
+    | Switch Bool Socket
     | SocketSwitched (Result Http.Error ())
     | ChangeSocket Socket
     | SocketChanged (Result Http.Error ())
@@ -67,6 +66,7 @@ type alias Socket =
     , physicalId : String
     , timerMode : Bool
     , switchedOn : Bool
+    , requestedSwitchedOn : Bool
     , realPower : Float
     , reactivePower : Float
     , frequency : Float

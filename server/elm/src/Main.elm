@@ -51,6 +51,7 @@ socketDecoder =
         |> required "physicalSocket" string
         |> required "timerMode" bool
         |> required "switchedOn" bool
+        |> required "requestedSwitchedOn" bool
         |> required "realPower" float
         |> required "reactivePower" float
         |> required "frequency" float
@@ -242,11 +243,15 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
-        SwitchOn socket ->
-            ( model, switchSocket True socket )
+        Switch switchedOn socket ->
+            case model.sockets of
+                Sockets sockets ->
+                    ( { model | sockets = Sockets (modifySocketRequiredSwitchedOn sockets socket switchedOn) }
+                    , switchSocket switchedOn socket
+                    )
 
-        SwitchOff socket ->
-            ( model, switchSocket False socket )
+                _ ->
+                    ( model, Cmd.none )
 
         SocketSwitched (Err _) ->
             ( { model | sockets = Error }, Cmd.none )
@@ -306,3 +311,16 @@ subscriptions model =
         [ pushMessage PushReceived
         , Time.every 1000 Tick
         ]
+
+
+modifySocketRequiredSwitchedOn : List Socket -> Socket -> Bool -> List Socket
+modifySocketRequiredSwitchedOn sockets socket value =
+    let
+        updateSocket s =
+            if s == socket then
+                { s | requestedSwitchedOn = value }
+
+            else
+                s
+    in
+    List.map updateSocket sockets

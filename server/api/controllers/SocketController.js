@@ -12,20 +12,7 @@ const defaultCreate = require(defaultActionsPath+'create.js'); // POST
 const defaultReplace = require(defaultActionsPath+'replace.js'); // PUT
 const defaultUpdate = require(defaultActionsPath+'update.js'); // PATCH
 const defaultDestroy = require(defaultActionsPath+'destroy.js'); // DELETE
-const request = require('request-promise-native');
 
-
-const updateSwitch = async function(id, onOrOff) {
-//  const apiUrl = `http://192.168.0.3:5000/set_switch/${id}/${onOrOff}`;
-  const apiUrl = `${process.env.SWITCH_API}/set_switch/${id}/${onOrOff}`;
-  sails.log(`sending "${onOrOff}" to switch ${id}`);
-  sails.log(apiUrl);
-  try {
-    await request.get(apiUrl);
-  } catch (e) {
-    console.log(`error, the socket API returned an error: ${e}`);
-  }
-};
 
 module.exports = {
   add: async function (req, res) {
@@ -46,7 +33,9 @@ module.exports = {
   setSwitch: async function (req, res) {
     const socket = await Socket.findOne({physicalSocket: req.param('device_id')});
     if (socket) {
-      updateSwitch(socket.physicalSocket, req.param('state'));
+      await sails.helpers.setSwitch(socket.physicalSocket, req.param('state'));
+      await Socket.updateOne({physicalSocket: req.param('device_id')})
+        .set({ requestedSwitchedOn: req.param('state') === 'on' });
       return res.send('ok');
 
     } else {
