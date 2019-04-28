@@ -22,12 +22,18 @@ view model =
                 p [] [ text "Loading switches" ]
 
             Sockets sockets ->
-                ul
-                    [ class "sockets" ]
-                    (List.map
-                        (viewSocket model.lastTick)
-                        (List.sortBy .id sockets)
-                    )
+                div []
+                    [ h2 []
+                        [ button [ onClick UserClickedManual ] [ text "Manual" ] -- this will turn on all switches and disable the schedulers
+                        , button [ onClick UserClickedAuto ] [ text "Auto" ] -- this will turn on the schedulers and set each switch according to the schedule
+                        ]
+                    , ul
+                          [ class "sockets" ]
+                          (List.map
+                               (viewSocket model.lastTick)
+                               (List.sortBy .id sockets)
+                          )
+                    ]
         , hr [] []
         , details []
             [ summary [] [ text "Add a switch" ]
@@ -112,16 +118,14 @@ viewSocket time socket =
                             "❌"
                         )
                     ]
-                , span
-                    [ class "switch" ]
-                    [ text
-                        (if socket.requestedSwitchedOn then
-                            "💡"
-
-                         else
-                            "❌"
-                        )
-                    ]
+                , if socket.requestedSwitchedOn /= socket.switchedOn then
+                      span
+                      [ class "switch"
+                      , title "The last known state of this switch doesn't map the requested state"
+                      ]
+                      [ text "⚠️" ]
+                  else
+                      text ""
                 , text " - "
                 , button [ onClick (Switch True socket) ] [ text "ON" ]
                 , text " - "

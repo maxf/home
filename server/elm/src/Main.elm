@@ -300,6 +300,12 @@ update msg model =
             , Cmd.none
             )
 
+        UserClickedAuto ->
+            ( model, Cmd.none )
+
+        UserClickedManual ->
+            ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS

@@ -6711,7 +6711,7 @@ var author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'Tick':
 				var time = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6720,8 +6720,14 @@ var author$project$Main$update = F2(
 							lastTick: elm$time$Time$posixToMillis(time)
 						}),
 					elm$core$Platform$Cmd$none);
+			case 'UserClickedAuto':
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
 	});
+var author$project$Model$UserClickedAuto = {$: 'UserClickedAuto'};
+var author$project$Model$UserClickedManual = {$: 'UserClickedManual'};
 var author$project$View$toEnglishMonth = function (month) {
 	switch (month.$) {
 		case 'Jan':
@@ -7114,17 +7120,17 @@ var author$project$View$viewSocket = F2(
 							elm$html$Html$text(
 							socket.switchedOn ? '💡' : '❌')
 						])),
-					A2(
+					(!_Utils_eq(socket.requestedSwitchedOn, socket.switchedOn)) ? A2(
 					elm$html$Html$span,
 					_List_fromArray(
 						[
-							elm$html$Html$Attributes$class('switch')
+							elm$html$Html$Attributes$class('switch'),
+							elm$html$Html$Attributes$title('The last known state of this switch doesn\'t map the requested state')
 						]),
 					_List_fromArray(
 						[
-							elm$html$Html$text(
-							socket.requestedSwitchedOn ? '💡' : '❌')
-						])),
+							elm$html$Html$text('⚠️')
+						])) : elm$html$Html$text(''),
 					elm$html$Html$text(' - '),
 					A2(
 					elm$html$Html$button,
@@ -7294,6 +7300,7 @@ var author$project$View$viewSocket = F2(
 	});
 var elm$core$List$sortBy = _List_sortBy;
 var elm$html$Html$h1 = _VirtualDom_node('h1');
+var elm$html$Html$h2 = _VirtualDom_node('h2');
 var elm$html$Html$hr = _VirtualDom_node('hr');
 var elm$html$Html$p = _VirtualDom_node('p');
 var author$project$View$view = function (model) {
@@ -7337,20 +7344,52 @@ var author$project$View$view = function (model) {
 					default:
 						var sockets = _n0.a;
 						return A2(
-							elm$html$Html$ul,
+							elm$html$Html$div,
+							_List_Nil,
 							_List_fromArray(
 								[
-									elm$html$Html$Attributes$class('sockets')
-								]),
-							A2(
-								elm$core$List$map,
-								author$project$View$viewSocket(model.lastTick),
-								A2(
-									elm$core$List$sortBy,
-									function ($) {
-										return $.id;
-									},
-									sockets)));
+									A2(
+									elm$html$Html$h2,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											elm$html$Html$button,
+											_List_fromArray(
+												[
+													elm$html$Html$Events$onClick(author$project$Model$UserClickedManual)
+												]),
+											_List_fromArray(
+												[
+													elm$html$Html$text('Manual')
+												])),
+											A2(
+											elm$html$Html$button,
+											_List_fromArray(
+												[
+													elm$html$Html$Events$onClick(author$project$Model$UserClickedAuto)
+												]),
+											_List_fromArray(
+												[
+													elm$html$Html$text('Auto')
+												]))
+										])),
+									A2(
+									elm$html$Html$ul,
+									_List_fromArray(
+										[
+											elm$html$Html$Attributes$class('sockets')
+										]),
+									A2(
+										elm$core$List$map,
+										author$project$View$viewSocket(model.lastTick),
+										A2(
+											elm$core$List$sortBy,
+											function ($) {
+												return $.id;
+											},
+											sockets)))
+								]));
 				}
 			}(),
 				A2(elm$html$Html$hr, _List_Nil, _List_Nil),

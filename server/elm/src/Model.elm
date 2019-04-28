@@ -20,6 +20,8 @@ type Msg
     | SocketChanged (Result Http.Error ())
     | PushReceived PushMessage
     | Tick Time.Posix
+    | UserClickedAuto
+    | UserClickedManual
 
 
 type alias PushMessage =
