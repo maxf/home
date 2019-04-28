@@ -49,19 +49,20 @@ try {
 }//-•
 
 
-// Check that we're connected to a socket API
 
+const tick = function() {
+  console.log('tick');
+  sails.helpers.setSwitch('7344', 'on').then(console.log('tock'));
+};
+
+
+// Check that we're connected to a socket API
 if (!process.env.SWITCH_API) {
   console.error('You need to set the SWITCH_API environment variable for this server to control your switches');
 } else {
   // Start server
   sails.lift(rc('sails'));
 
-  // start scheduler
-  console.log('starting the sceheduler');
-  setInterval(() => {
-    console.log('tick');
-    //    sails.helpers.setSwitch('7344', 'on');
-    console.log('tock');
-  }, 3000);
+  setInterval(tick, 5000);
+
 }
